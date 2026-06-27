@@ -75,3 +75,7 @@ func (s *UserService) Authenticate(ctx context.Context, username, password strin
 func (s *UserService) ByID(ctx context.Context, id string) (*domain.User, error) {
 	return s.users.ByID(ctx, id)
 }
+
+func (s *UserService) ByUsername(ctx context.Context, name string) (*domain.User, error) {
+	return s.users.ByUsername(ctx, strings.ToLower(strings.TrimSpace(name)))
+}
