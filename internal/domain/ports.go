@@ -24,3 +24,13 @@ type GitService interface {
 	InitBare(ctx context.Context, owner, name, defaultBranch string) error
 	RemovePath(ctx context.Context, owner, name string) error
 }
+
+type GitReader interface {
+	IsEmpty(ctx context.Context, owner, name string) (bool, error)
+	Branches(ctx context.Context, owner, name string) ([]string, error)
+	Tip(ctx context.Context, owner, name, ref string) (*Commit, error)
+	Tree(ctx context.Context, owner, name, ref, path string) ([]TreeEntry, error)
+	Blob(ctx context.Context, owner, name, ref, path string) (*FileBlob, error)
+	Log(ctx context.Context, owner, name, ref string, limit, offset int) ([]Commit, error)
+	CommitDiff(ctx context.Context, owner, name, hash string) (*Commit, []FileDiff, error)
+}
