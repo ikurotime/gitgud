@@ -6,6 +6,7 @@ import (
 
 	"gitgud/internal/app"
 	"gitgud/internal/infra/config"
+	"gitgud/internal/infra/git"
 	"gitgud/internal/infra/persistence/sqlite"
 	"gitgud/internal/infra/security"
 	"gitgud/internal/infra/session"
@@ -27,8 +28,13 @@ func main() {
 	hasher := security.NewBcryptHasher()
 	userRepo := sqlite.NewUserRepo(db)
 	userService := app.NewUserService(userRepo, hasher)
+
+	gitSvc := git.NewCLIGit(cfg.ReposDir())
+	repoRepo := sqlite.NewRepoRepo(db)
+	repoService := app.NewRepoService(repoRepo, gitSvc)
+
 	sm := session.NewSessionManager(db)
-	handlers := web.NewHandlers(userService, sm)
+	handlers := web.NewHandlers(userService, repoService, sm)
 
 	handler := web.NewRouter(cfg, handlers)
 

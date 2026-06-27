@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 
 	"gitgud/internal/infra/config"
-	"gitgud/internal/interface/web/templates"
 )
 
 var staticFS embed.FS
@@ -27,19 +26,20 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 	})
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer((http.FS(staticFS)))))
 
-	r.Get("/", homeHandler)
-
 	r.Get("/register", h.showRegister)
 	r.Post("/register", h.doRegister)
 	r.Get("/login", h.showLogin)
 	r.Post("/login", h.doLogin)
 	r.Post("/logout", h.doLogout)
 
-	return r
-}
+	r.With(h.requireAuth).Get("/new", h.showNewRepo)
+	r.With(h.requireAuth).Post("/new", h.createRepo)
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusOK, templates.Home(currentUser(r.Context())))
+	r.Get("/", h.dashboard)
+	r.Get("/{owner}", h.profile)
+	r.Get("/{owner}/{repo}", h.repoHome)
+
+	return r
 }
 
 func render(w http.ResponseWriter, r *http.Request, status int, c templ.Component) {

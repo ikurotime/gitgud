@@ -19,11 +19,12 @@ const userCtxKey ctxKey = iota
 
 type Handlers struct {
 	users *app.UserService
+	repos *app.RepoService
 	sm    *scs.SessionManager
 }
 
-func NewHandlers(users *app.UserService, sm *scs.SessionManager) *Handlers {
-	return &Handlers{users: users, sm: sm}
+func NewHandlers(users *app.UserService, repos *app.RepoService, sm *scs.SessionManager) *Handlers {
+	return &Handlers{users: users, repos: repos, sm: sm}
 }
 
 func (h *Handlers) withUser(next http.Handler) http.Handler {
