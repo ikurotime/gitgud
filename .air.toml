@@ -1,0 +1,22 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+# Regenerate templ files, then build the server.
+cmd = "templ generate && go build -o ./tmp/main ./cmd/server"
+bin = "./tmp/main"
+include_ext = ["go", "templ", "html", "css", "js"]
+# Generated templ files are written by the build step itself — don't let them
+# trigger another rebuild (avoids an infinite loop).
+exclude_regex = ["_templ.go$"]
+exclude_dir = ["tmp", "data", "docs", ".git", ".claude"]
+delay = 200
+stop_on_error = true
+send_interrupt = true
+kill_delay = 2000
+
+[log]
+time = true
+
+[misc]
+clean_on_exit = true
