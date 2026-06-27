@@ -4,9 +4,33 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"gitgud/internal/domain"
+	"gitgud/internal/interface/web/presenter"
 )
+
+func markdown(s string) string {
+	return presenter.RenderMarkdown([]byte(s))
+}
+
+func fmtTime(t time.Time) string {
+	return t.Format("2006-01-02 15:04")
+}
+
+func stateAction(state domain.IssueState) string {
+	if state == domain.IssueOpen {
+		return "/close"
+	}
+	return "/reopen"
+}
+
+func stateTabClass(current, want string) string {
+	if current == want {
+		return "font-semibold"
+	}
+	return "text-gray-600"
+}
 
 func cloneInstructions(repo *domain.Repository) string {
 	url := "http://localhost:8080/" + repo.OwnerName + "/" + repo.Name + ".git"

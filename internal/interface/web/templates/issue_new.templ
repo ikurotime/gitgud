@@ -1,0 +1,22 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ IssueNew(user *domain.User, repo *domain.Repository, title, body, errMsg string) {
+	@Layout("New issue · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "issues")
+			<h2 class="text-lg mb-3">New issue</h2>
+			if errMsg != "" {
+				<p class="text-red-600 mb-3">{ errMsg }</p>
+			}
+			<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues")) } class="flex flex-col gap-3">
+				<input class="border px-2 py-1" type="text" name="title" placeholder="Title" value={ title } autofocus/>
+				<textarea class="border px-2 py-1" name="body" rows="8" placeholder="Leave a description (markdown supported)">{ body }</textarea>
+				<div>
+					<button class="border px-3 py-1" type="submit">Create issue</button>
+				</div>
+			</form>
+		</div>
+	}
+}

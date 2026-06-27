@@ -25,6 +25,17 @@ type GitService interface {
 	RemovePath(ctx context.Context, owner, name string) error
 }
 
+type IssueRepository interface {
+	Create(ctx context.Context, i *Issue) error
+	ByNumber(ctx context.Context, repoID int64, number int) (*Issue, error)
+	List(ctx context.Context, repoID int64, state IssueState) ([]*Issue, error)
+	SetState(ctx context.Context, id int64, state IssueState) error
+
+	AddComment(ctx context.Context, c *IssueComment) error
+	Comments(ctx context.Context, issueID int64) ([]*IssueComment, error)
+	CountByState(ctx context.Context, repoID int64) (open, closed int, err error)
+}
+
 type GitReader interface {
 	IsEmpty(ctx context.Context, owner, name string) (bool, error)
 	Branches(ctx context.Context, owner, name string) ([]string, error)

@@ -1,0 +1,48 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ IssueDetail(user *domain.User, repo *domain.Repository, issue *domain.Issue, comments []*domain.IssueComment, canModify bool) {
+	@Layout(issue.Title+" · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "issues")
+			<div class="flex items-center gap-2 mb-1">
+				<h2 class="text-xl">{ issue.Title } <span class="text-gray-400">#{ itoa(issue.Number) }</span></h2>
+				<span class="text-xs border px-2 py-0.5">{ string(issue.State) }</span>
+			</div>
+			<div class="text-xs text-gray-500 mb-4">opened by { issue.AuthorName } on { fmtTime(issue.CreatedAt) }</div>
+			@commentCard(issue.AuthorName, fmtTime(issue.CreatedAt), issue.Body)
+			for _, c := range comments {
+				@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
+			}
+			if canModify {
+				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+stateAction(issue.State))) } class="mb-4">
+					if issue.State == domain.IssueOpen {
+						<button class="border px-3 py-1 text-sm" type="submit">Close issue</button>
+					} else {
+						<button class="border px-3 py-1 text-sm" type="submit">Reopen issue</button>
+					}
+				</form>
+			}
+			if user != nil {
+				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+"/comments")) } class="flex flex-col gap-2">
+					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
+					<div>
+						<button class="border px-3 py-1" type="submit">Comment</button>
+					</div>
+				</form>
+			} else {
+				<p class="text-sm text-gray-500"><a href="/login">Sign in</a> to comment.</p>
+			}
+		</div>
+	}
+}
+
+templ commentCard(author, when, body string) {
+	<div class="border mb-3">
+		<div class="bg-gray-100 px-3 py-1 text-xs text-gray-600">{ author } commented on { when }</div>
+		<div class="px-3 py-2">
+			@templ.Raw(markdown(body))
+		</div>
+	</div>
+}

@@ -49,6 +49,14 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 	r.Get("/{owner}/{repo}/commits/{ref}", h.repoCommits)
 	r.Get("/{owner}/{repo}/commit/{hash}", h.repoCommit)
 
+	r.Get("/{owner}/{repo}/issues", h.issuesList)
+	r.With(h.requireAuth).Get("/{owner}/{repo}/issues/new", h.newIssue)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/issues", h.createIssue)
+	r.Get("/{owner}/{repo}/issues/{number}", h.issueDetail)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/issues/{number}/comments", h.addIssueComment)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/issues/{number}/close", h.closeIssue)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/issues/{number}/reopen", h.reopenIssue)
+
 	return r
 }
 

@@ -153,9 +153,12 @@ func (h *Handlers) viewRepo(w http.ResponseWriter, r *http.Request) *domain.Repo
 }
 
 func (h *Handlers) gitError(w http.ResponseWriter, r *http.Request, err error) {
-	if errors.Is(err, domain.ErrNotFound) {
+	switch {
+	case errors.Is(err, domain.ErrNotFound):
 		h.notFound(w, r)
-		return
+	case errors.Is(err, domain.ErrPermission):
+		http.Error(w, "forbidden", http.StatusForbidden)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
