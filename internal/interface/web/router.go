@@ -35,6 +35,10 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 	r.With(h.requireAuth).Get("/new", h.showNewRepo)
 	r.With(h.requireAuth).Post("/new", h.createRepo)
 
+	r.Get("/{owner}/{repo}/info/refs", h.gitHTTP)
+	r.Post("/{owner}/{repo}/git-upload-pack", h.gitHTTP)
+	r.Post("/{owner}/{repo}/git-receive-pack", h.gitHTTP)
+
 	r.Get("/", h.dashboard)
 	r.Get("/{owner}", h.profile)
 	r.Get("/{owner}/{repo}", h.repoHome)

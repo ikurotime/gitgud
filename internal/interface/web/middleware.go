@@ -9,6 +9,7 @@ import (
 
 	"gitgud/internal/app"
 	"gitgud/internal/domain"
+	"gitgud/internal/infra/git"
 )
 
 const sessionUserIDKey = "user_id"
@@ -18,13 +19,15 @@ type ctxKey int
 const userCtxKey ctxKey = iota
 
 type Handlers struct {
-	users *app.UserService
-	repos *app.RepoService
-	sm    *scs.SessionManager
+	users      *app.UserService
+	repos      *app.RepoService
+	gitAccess  *app.GitAccessService
+	gitBackend *git.Backend
+	sm         *scs.SessionManager
 }
 
-func NewHandlers(users *app.UserService, repos *app.RepoService, sm *scs.SessionManager) *Handlers {
-	return &Handlers{users: users, repos: repos, sm: sm}
+func NewHandlers(users *app.UserService, repos *app.RepoService, gitAccess *app.GitAccessService, gitBackend *git.Backend, sm *scs.SessionManager) *Handlers {
+	return &Handlers{users: users, repos: repos, gitAccess: gitAccess, gitBackend: gitBackend, sm: sm}
 }
 
 func (h *Handlers) withUser(next http.Handler) http.Handler {
