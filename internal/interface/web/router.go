@@ -41,7 +41,13 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 
 	r.Get("/", h.dashboard)
 	r.Get("/{owner}", h.profile)
-	r.Get("/{owner}/{repo}", h.repoHome)
+	r.Get("/{owner}/{repo}", h.repoTreeRoot)
+	r.Get("/{owner}/{repo}/tree/{ref}", h.repoTree)
+	r.Get("/{owner}/{repo}/tree/{ref}/*", h.repoTree)
+	r.Get("/{owner}/{repo}/blob/{ref}/*", h.repoBlob)
+	r.Get("/{owner}/{repo}/raw/{ref}/*", h.repoRaw)
+	r.Get("/{owner}/{repo}/commits/{ref}", h.repoCommits)
+	r.Get("/{owner}/{repo}/commit/{hash}", h.repoCommit)
 
 	return r
 }

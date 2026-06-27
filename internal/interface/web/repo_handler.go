@@ -80,31 +80,6 @@ func (h *Handlers) profile(w http.ResponseWriter, r *http.Request) {
 	render(w, r, http.StatusOK, templates.Profile(viewer, owner.Username, visible))
 }
 
-func (h *Handlers) repoHome(w http.ResponseWriter, r *http.Request) {
-	repo := h.loadViewableRepo(w, r)
-	if repo == nil {
-		return
-	}
-	render(w, r, http.StatusOK, templates.RepoHome(currentUser(r.Context()), repo))
-}
-
-func (h *Handlers) loadViewableRepo(w http.ResponseWriter, r *http.Request) *domain.Repository {
-	viewer := currentUser(r.Context())
-	owner := chi.URLParam(r, "owner")
-	name := chi.URLParam(r, "repo")
-
-	repo, err := h.repos.Get(r.Context(), owner, name)
-	if err != nil {
-		h.notFound(w, r)
-		return nil
-	}
-	if err := app.CanView(repo, viewer); err != nil {
-		h.notFound(w, r)
-		return nil
-	}
-	return repo
-}
-
 func (h *Handlers) notFound(w http.ResponseWriter, r *http.Request) {
 	render(w, r, http.StatusNotFound, templates.NotFound(currentUser(r.Context())))
 }

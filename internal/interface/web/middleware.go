@@ -21,13 +21,14 @@ const userCtxKey ctxKey = iota
 type Handlers struct {
 	users      *app.UserService
 	repos      *app.RepoService
+	browse     *app.BrowseService
 	gitAccess  *app.GitAccessService
 	gitBackend *git.Backend
 	sm         *scs.SessionManager
 }
 
-func NewHandlers(users *app.UserService, repos *app.RepoService, gitAccess *app.GitAccessService, gitBackend *git.Backend, sm *scs.SessionManager) *Handlers {
-	return &Handlers{users: users, repos: repos, gitAccess: gitAccess, gitBackend: gitBackend, sm: sm}
+func NewHandlers(users *app.UserService, repos *app.RepoService, browse *app.BrowseService, gitAccess *app.GitAccessService, gitBackend *git.Backend, sm *scs.SessionManager) *Handlers {
+	return &Handlers{users: users, repos: repos, browse: browse, gitAccess: gitAccess, gitBackend: gitBackend, sm: sm}
 }
 
 func (h *Handlers) withUser(next http.Handler) http.Handler {
