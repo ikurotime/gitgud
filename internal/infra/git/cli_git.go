@@ -30,6 +30,11 @@ func (g CLIGit) InitBare(ctx context.Context, owner, name, defaultBranch string)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("git init: %v: %s", err, out)
 	}
+
+	cmd = exec.CommandContext(ctx, "git", "-C", path, "config", "http.receivepack", "true")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("git config http.receivepack: %v: %s", err, out)
+	}
 	return nil
 }
 
