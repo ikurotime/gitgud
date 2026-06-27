@@ -1,11 +1,15 @@
 package main
 
 import (
-	"gitgud/internal/infra/config"
-	"gitgud/internal/infra/persistence/sqlite"
-	"gitgud/internal/interface/web"
 	"log"
 	"net/http"
+
+	"gitgud/internal/app"
+	"gitgud/internal/infra/config"
+	"gitgud/internal/infra/persistence/sqlite"
+	"gitgud/internal/infra/security"
+	"gitgud/internal/infra/session"
+	"gitgud/internal/interface/web"
 )
 
 func main() {
@@ -20,7 +24,13 @@ func main() {
 	}
 	defer db.Close()
 
-	handler := web.NewRouter(cfg)
+	hasher := security.NewBcryptHasher()
+	userRepo := sqlite.NewUserRepo(db)
+	userService := app.NewUserService(userRepo, hasher)
+	sm := session.NewSessionManager(db)
+	handlers := web.NewHandlers(userService, sm)
+
+	handler := web.NewRouter(cfg, handlers)
 
 	log.Printf("listening on %s", cfg.Addr)
 	log.Fatal(http.ListenAndServe(cfg.Addr, handler))
