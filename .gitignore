@@ -1,4 +1,5 @@
 .env*
 docs
 app.db
+data/
 tmp/
