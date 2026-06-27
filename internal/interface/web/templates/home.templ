@@ -1,7 +1,9 @@
 package templates
 
-templ Home() {
-	@Layout("gitgud") {
+import "gitgud/internal/domain"
+
+templ Home(user *domain.User) {
+	@Layout("gitgud", user) {
 		<div class="text-3xl">gitgud cool homepage</div>
 	}
 }

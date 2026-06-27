@@ -1,6 +1,8 @@
 package templates
 
-templ Layout(title string) {
+import "gitgud/internal/domain"
+
+templ Layout(title string, user *domain.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -11,7 +13,23 @@ templ Layout(title string) {
 			<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 		</head>
 		<body>
-			{ children... }
+			<nav class="flex items-center justify-between px-6 py-3 border-b">
+				<a href="/" class="font-bold">gitgud</a>
+				<div class="flex items-center gap-4">
+					if user != nil {
+						<span>{ user.Username }</span>
+						<form method="post" action="/logout">
+							<button type="submit">Log out</button>
+						</form>
+					} else {
+						<a href="/login">Log in</a>
+						<a href="/register">Register</a>
+					}
+				</div>
+			</nav>
+			<main class="p-6">
+				{ children... }
+			</main>
 		</body>
 	</html>
 }
