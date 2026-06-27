@@ -47,13 +47,17 @@ func (g CLIGit) RemovePath(ctx context.Context, owner, name string) error {
 }
 
 func (g CLIGit) repoPath(owner, name string) (string, error) {
+	return repoPath(g.reposDir, owner, name)
+}
+
+func repoPath(reposDir, owner, name string) (string, error) {
 	if err := safeSegment(owner); err != nil {
 		return "", err
 	}
 	if err := safeSegment(name); err != nil {
 		return "", err
 	}
-	return filepath.Join(g.reposDir, owner, name+".git"), nil
+	return filepath.Join(reposDir, owner, name+".git"), nil
 }
 
 func safeSegment(s string) error {
