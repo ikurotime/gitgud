@@ -1,0 +1,21 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ Forbidden(user *domain.User) {
+	@Layout("Forbidden · gitgud", user) {
+		<div class="max-w-2xl mx-auto">
+			<h1 class="text-2xl mb-2">403</h1>
+			<p>You don't have permission to do that.</p>
+		</div>
+	}
+}
+
+templ ServerError(user *domain.User) {
+	@Layout("Error · gitgud", user) {
+		<div class="max-w-2xl mx-auto">
+			<h1 class="text-2xl mb-2">500</h1>
+			<p>Something went wrong. Please try again.</p>
+		</div>
+	}
+}

@@ -27,6 +27,7 @@ templ PullDetail(user *domain.User, repo *domain.Repository, pr *domain.PullRequ
 					<div class="text-gray-600">This pull request was closed.</div>
 				} else if canMerge {
 					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/merge")) }>
+						@csrfField()
 						<button class="border px-3 py-1 bg-green-700 text-white" type="submit">Merge pull request</button>
 					</form>
 				} else if user != nil {
@@ -43,6 +44,7 @@ templ PullDetail(user *domain.User, repo *domain.Repository, pr *domain.PullRequ
 			}
 			if user != nil {
 				<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/comments")) } class="flex flex-col gap-2 mt-4">
+					@csrfField()
 					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
 					<div><button class="border px-3 py-1" type="submit">Comment</button></div>
 				</form>

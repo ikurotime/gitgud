@@ -33,12 +33,12 @@ func (h *Handlers) issuesList(w http.ResponseWriter, r *http.Request) {
 
 	issues, err := h.issues.List(r.Context(), repo.ID, filter)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	open, closed, err := h.issues.Counts(r.Context(), repo.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	render(w, r, http.StatusOK, templates.IssuesList(currentUser(r.Context()), repo, state, issues, open, closed))
@@ -67,7 +67,7 @@ func (h *Handlers) createIssue(w http.ResponseWriter, r *http.Request) {
 			render(w, r, http.StatusBadRequest, templates.IssueNew(currentUser(r.Context()), repo, title, body, msg))
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/issues/"+strconv.Itoa(issue.Number)), http.StatusSeeOther)
@@ -80,7 +80,7 @@ func (h *Handlers) issueDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	comments, err := h.issues.Comments(r.Context(), issue.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	canModify := app.CanModifyIssue(repo, issue, currentUser(r.Context()))
@@ -93,7 +93,7 @@ func (h *Handlers) addIssueComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.issues.Comment(r.Context(), issue, currentUser(r.Context()), r.FormValue("body")); err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/issues/"+strconv.Itoa(issue.Number)), http.StatusSeeOther)
@@ -105,7 +105,7 @@ func (h *Handlers) closeIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.issues.Close(r.Context(), repo, issue, currentUser(r.Context())); err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/issues/"+strconv.Itoa(issue.Number)), http.StatusSeeOther)
@@ -117,7 +117,7 @@ func (h *Handlers) reopenIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.issues.Reopen(r.Context(), repo, issue, currentUser(r.Context())); err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/issues/"+strconv.Itoa(issue.Number)), http.StatusSeeOther)
@@ -135,7 +135,7 @@ func (h *Handlers) loadIssue(w http.ResponseWriter, r *http.Request) (*domain.Re
 	}
 	issue, _, err := h.issues.Get(r.Context(), repo.ID, number)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return nil, nil
 	}
 	return repo, issue

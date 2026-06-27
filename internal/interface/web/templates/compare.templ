@@ -27,6 +27,7 @@ templ Compare(user *domain.User, repo *domain.Repository, base, head string, bra
 				<div class="mb-4 text-sm text-gray-600">{ itoa(len(cmp.Commits)) } commit(s), { itoa(len(cmp.Files)) } file(s) changed</div>
 				if user != nil && cmp.Mergeable {
 					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls")) } class="flex flex-col gap-3 mb-6 border p-3">
+						@csrfField()
 						<input type="hidden" name="base" value={ base }/>
 						<input type="hidden" name="head" value={ head }/>
 						<input class="border px-2 py-1" type="text" name="title" placeholder="Title" value={ head }/>

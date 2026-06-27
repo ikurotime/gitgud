@@ -18,6 +18,8 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 
 	r.Use(middleware.Logger, middleware.Recoverer)
 	r.Use(h.sm.LoadAndSave)
+	r.Use(csrf)
+	r.Use(h.withFlash)
 	r.Use(h.withUser)
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {

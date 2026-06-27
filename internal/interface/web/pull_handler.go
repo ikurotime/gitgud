@@ -35,12 +35,12 @@ func (h *Handlers) pullsList(w http.ResponseWriter, r *http.Request) {
 
 	prs, err := h.pulls.List(r.Context(), repo.ID, filter)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	open, merged, closed, err := h.pulls.Counts(r.Context(), repo.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	render(w, r, http.StatusOK, templates.PullsList(currentUser(r.Context()), repo, state, prs, open, merged, closed))
@@ -54,7 +54,7 @@ func (h *Handlers) comparePull(w http.ResponseWriter, r *http.Request) {
 
 	branches, err := h.browse.Branches(r.Context(), repo)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (h *Handlers) createPull(w http.ResponseWriter, r *http.Request) {
 			render(w, r, http.StatusBadRequest, templates.Compare(currentUser(r.Context()), repo, base, head, branches, cmp, msg))
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/pulls/"+strconv.Itoa(pr.Number)), http.StatusSeeOther)
@@ -114,7 +114,7 @@ func (h *Handlers) addPullComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.pulls.Comment(r.Context(), pr, currentUser(r.Context()), r.FormValue("body")); err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/pulls/"+strconv.Itoa(pr.Number)), http.StatusSeeOther)
@@ -127,6 +127,7 @@ func (h *Handlers) mergePull(w http.ResponseWriter, r *http.Request) {
 	}
 	err := h.pulls.Merge(r.Context(), repo, pr, currentUser(r.Context()))
 	if err == nil {
+		h.flash(r, "Pull request merged.")
 		http.Redirect(w, r, repoURL(repo, "/pulls/"+strconv.Itoa(pr.Number)), http.StatusSeeOther)
 		return
 	}
@@ -134,7 +135,7 @@ func (h *Handlers) mergePull(w http.ResponseWriter, r *http.Request) {
 		h.renderPull(w, r, repo, pr, "Cannot merge automatically — the branches conflict.", http.StatusConflict)
 		return
 	}
-	h.gitError(w, r, err)
+	h.writeError(w, r, err)
 }
 
 func (h *Handlers) closePull(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +144,7 @@ func (h *Handlers) closePull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.pulls.Close(r.Context(), repo, pr, currentUser(r.Context())); err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, repoURL(repo, "/pulls/"+strconv.Itoa(pr.Number)), http.StatusSeeOther)
@@ -153,7 +154,7 @@ func (h *Handlers) renderPull(w http.ResponseWriter, r *http.Request, repo *doma
 	cmp, _ := h.pulls.Compare(r.Context(), repo, pr.BaseBranch, pr.HeadBranch)
 	comments, err := h.pulls.Comments(r.Context(), pr.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	canMerge := pr.State == domain.PROpen && app.CanMergePR(repo, currentUser(r.Context())) && cmp != nil && cmp.Mergeable
@@ -172,7 +173,7 @@ func (h *Handlers) loadPull(w http.ResponseWriter, r *http.Request) (*domain.Rep
 	}
 	pr, err := h.pulls.Get(r.Context(), repo.ID, number)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return nil, nil
 	}
 	return repo, pr

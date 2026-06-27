@@ -21,7 +21,7 @@ func (h *Handlers) dashboard(w http.ResponseWriter, r *http.Request) {
 
 	repos, err := h.repos.ListByOwner(r.Context(), user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	render(w, r, http.StatusOK, templates.Dashboard(user, repos))
@@ -52,6 +52,7 @@ func (h *Handlers) createRepo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.flash(r, "Repository created.")
 	http.Redirect(w, r, "/"+repo.OwnerName+"/"+repo.Name, http.StatusSeeOther)
 }
 
@@ -67,7 +68,7 @@ func (h *Handlers) profile(w http.ResponseWriter, r *http.Request) {
 
 	repos, err := h.repos.ListByOwner(r.Context(), owner.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 

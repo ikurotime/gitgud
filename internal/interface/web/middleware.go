@@ -6,10 +6,12 @@ import (
 	"strconv"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/justinas/nosurf"
 
 	"gitgud/internal/app"
 	"gitgud/internal/domain"
 	"gitgud/internal/infra/git"
+	"gitgud/internal/interface/web/templates"
 )
 
 const sessionUserIDKey = "user_id"
@@ -57,4 +59,32 @@ func (h *Handlers) requireAuth(next http.Handler) http.Handler {
 func currentUser(ctx context.Context) *domain.User {
 	u, _ := ctx.Value(userCtxKey).(*domain.User)
 	return u
+}
+
+func (h *Handlers) withFlash(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if msg := h.sm.PopString(r.Context(), "flash"); msg != "" {
+			r = r.WithContext(templates.WithFlash(r.Context(), msg))
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h *Handlers) flash(r *http.Request, msg string) {
+	h.sm.Put(r.Context(), "flash", msg)
+}
+
+func csrf(next http.Handler) http.Handler {
+	s := nosurf.New(injectCSRFToken(next))
+	s.ExemptRegexp(`/(git-upload-pack|git-receive-pack)$`)
+	s.SetFailureHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "CSRF token invalid", http.StatusBadRequest)
+	}))
+	return s
+}
+
+func injectCSRFToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r.WithContext(templates.WithCSRF(r.Context(), nosurf.Token(r))))
+	})
 }

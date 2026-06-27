@@ -17,19 +17,28 @@ templ Layout(title string, user *domain.User) {
 				<a href="/" class="font-bold">gitgud</a>
 				<div class="flex items-center gap-4">
 					if user != nil {
+						<a href="/new">New</a>
 						<span>{ user.Username }</span>
 						<form method="post" action="/logout">
-							<button type="submit">Log out</button>
+							@csrfField()
+							<button type="submit">Sign out</button>
 						</form>
 					} else {
-						<a href="/login">Log in</a>
+						<a href="/login">Sign in</a>
 						<a href="/register">Register</a>
 					}
 				</div>
 			</nav>
+			if flashOf(ctx) != "" {
+				<div class="px-6 py-2 bg-blue-50 border-b border-blue-200 text-blue-800 text-sm">{ flashOf(ctx) }</div>
+			}
 			<main class="p-6">
 				{ children... }
 			</main>
 		</body>
 	</html>
+}
+
+templ csrfField() {
+	<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
 }

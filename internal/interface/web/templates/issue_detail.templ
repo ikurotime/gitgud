@@ -17,6 +17,7 @@ templ IssueDetail(user *domain.User, repo *domain.Repository, issue *domain.Issu
 			}
 			if canModify {
 				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+stateAction(issue.State))) } class="mb-4">
+					@csrfField()
 					if issue.State == domain.IssueOpen {
 						<button class="border px-3 py-1 text-sm" type="submit">Close issue</button>
 					} else {
@@ -26,6 +27,7 @@ templ IssueDetail(user *domain.User, repo *domain.Repository, issue *domain.Issu
 			}
 			if user != nil {
 				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+"/comments")) } class="flex flex-col gap-2">
+					@csrfField()
 					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
 					<div>
 						<button class="border px-3 py-1" type="submit">Comment</button>

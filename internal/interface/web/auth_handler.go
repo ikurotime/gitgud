@@ -48,7 +48,7 @@ func (h *Handlers) doLogin(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) doLogout(w http.ResponseWriter, r *http.Request) {
 	if err := h.sm.Destroy(r.Context()); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.writeError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)

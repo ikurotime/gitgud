@@ -66,20 +66,28 @@ func Login(user *domain.User, username, errMsg string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form method=\"post\" action=\"/login\" class=\"flex flex-col gap-3\"><label class=\"flex flex-col gap-1\"><span>Username</span> <input class=\"border px-2 py-1\" type=\"text\" name=\"username\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form method=\"post\" action=\"/login\" class=\"flex flex-col gap-3\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = csrfField().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<label class=\"flex flex-col gap-1\"><span>Username</span> <input class=\"border px-2 py-1\" type=\"text\" name=\"username\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/login.templ`, Line: 15, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/login.templ`, Line: 16, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" autofocus></label> <label class=\"flex flex-col gap-1\"><span>Password</span> <input class=\"border px-2 py-1\" type=\"password\" name=\"password\"></label> <button class=\"border px-3 py-1\" type=\"submit\">Log in</button></form><p class=\"mt-3 text-sm\">No account? <a href=\"/register\">Register</a></p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" autofocus></label> <label class=\"flex flex-col gap-1\"><span>Password</span> <input class=\"border px-2 py-1\" type=\"password\" name=\"password\"></label> <button class=\"border px-3 py-1\" type=\"submit\">Log in</button></form><p class=\"mt-3 text-sm\">No account? <a href=\"/register\">Register</a></p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

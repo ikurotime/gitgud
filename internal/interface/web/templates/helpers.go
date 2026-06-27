@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,6 +10,31 @@ import (
 	"gitgud/internal/domain"
 	"gitgud/internal/interface/web/presenter"
 )
+
+type ctxKey int
+
+const (
+	flashKey ctxKey = iota
+	csrfKey
+)
+
+func WithFlash(ctx context.Context, msg string) context.Context {
+	return context.WithValue(ctx, flashKey, msg)
+}
+
+func flashOf(ctx context.Context) string {
+	s, _ := ctx.Value(flashKey).(string)
+	return s
+}
+
+func WithCSRF(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, csrfKey, token)
+}
+
+func csrfToken(ctx context.Context) string {
+	s, _ := ctx.Value(csrfKey).(string)
+	return s
+}
 
 func markdown(s string) string {
 	return presenter.RenderMarkdown([]byte(s))

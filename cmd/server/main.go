@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"gitgud/internal/app"
 	"gitgud/internal/infra/config"
@@ -50,6 +51,15 @@ func main() {
 
 	handler := web.NewRouter(cfg, handlers)
 
+	srv := &http.Server{
+		Addr:              cfg.Addr,
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       60 * time.Second,
+		WriteTimeout:      120 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+
 	log.Printf("listening on %s", cfg.Addr)
-	log.Fatal(http.ListenAndServe(cfg.Addr, handler))
+	log.Fatal(srv.ListenAndServe())
 }

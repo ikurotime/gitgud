@@ -2,6 +2,7 @@ package web
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -33,7 +34,7 @@ func (h *Handlers) renderTree(w http.ResponseWriter, r *http.Request, repo *doma
 
 	empty, err := h.browse.IsEmpty(ctx, repo)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	if empty {
@@ -47,12 +48,12 @@ func (h *Handlers) renderTree(w http.ResponseWriter, r *http.Request, repo *doma
 
 	branches, err := h.browse.Branches(ctx, repo)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	entries, err := h.browse.Tree(ctx, repo, ref, path)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 
@@ -79,7 +80,7 @@ func (h *Handlers) repoBlob(w http.ResponseWriter, r *http.Request) {
 
 	blob, err := h.browse.Blob(r.Context(), repo, ref, path)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	if ref == "" {
@@ -100,7 +101,7 @@ func (h *Handlers) repoRaw(w http.ResponseWriter, r *http.Request) {
 	}
 	blob, err := h.browse.Blob(r.Context(), repo, chi.URLParam(r, "ref"), chi.URLParam(r, "*"))
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 
@@ -121,7 +122,7 @@ func (h *Handlers) repoCommits(w http.ResponseWriter, r *http.Request) {
 
 	commits, err := h.browse.Log(r.Context(), repo, ref, 50, 0)
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	if ref == "" {
@@ -137,7 +138,7 @@ func (h *Handlers) repoCommit(w http.ResponseWriter, r *http.Request) {
 	}
 	commit, diffs, err := h.browse.CommitDiff(r.Context(), repo, chi.URLParam(r, "hash"))
 	if err != nil {
-		h.gitError(w, r, err)
+		h.writeError(w, r, err)
 		return
 	}
 	render(w, r, http.StatusOK, templates.CommitDetail(currentUser(r.Context()), repo, commit, diffs))
@@ -152,13 +153,17 @@ func (h *Handlers) viewRepo(w http.ResponseWriter, r *http.Request) *domain.Repo
 	return repo
 }
 
-func (h *Handlers) gitError(w http.ResponseWriter, r *http.Request, err error) {
+func (h *Handlers) writeError(w http.ResponseWriter, r *http.Request, err error) {
+	user := currentUser(r.Context())
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
-		h.notFound(w, r)
+		render(w, r, http.StatusNotFound, templates.NotFound(user))
 	case errors.Is(err, domain.ErrPermission):
-		http.Error(w, "forbidden", http.StatusForbidden)
+		render(w, r, http.StatusForbidden, templates.Forbidden(user))
+	case errors.Is(err, domain.ErrUnauthorized):
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("server error: %v", err)
+		render(w, r, http.StatusInternalServerError, templates.ServerError(user))
 	}
 }
