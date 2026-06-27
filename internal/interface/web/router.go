@@ -1,8 +1,10 @@
 package web
 
 import (
+	"context"
 	"embed"
 	"gitgud/internal/infra/config"
+	"gitgud/internal/interface/web/templates"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -23,11 +25,12 @@ func NewRouter(cfg config.Config) http.Handler {
 		w.Write([]byte("OK"))
 	})
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer((http.FS(staticFS)))))
+
 	r.Get("/", homeHandler)
 	return r
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Welcome to GitGud!"))
+	component := templates.Home()
+	component.Render(context.Background(), w)
 }
