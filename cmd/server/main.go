@@ -36,6 +36,8 @@ func main() {
 	browseService := app.NewBrowseService(repoRepo, gitReader)
 	issueRepo := sqlite.NewIssueRepo(db)
 	issueService := app.NewIssueService(issueRepo)
+	prRepo := sqlite.NewPRRepo(db)
+	pullService := app.NewPullService(prRepo, gitReader, gitSvc)
 	gitAccess := app.NewGitAccessService(repoRepo)
 
 	gitBackend, err := git.NewBackend(cfg.ReposDir())
@@ -44,7 +46,7 @@ func main() {
 	}
 
 	sm := session.NewSessionManager(db)
-	handlers := web.NewHandlers(userService, repoService, browseService, issueService, gitAccess, gitBackend, sm)
+	handlers := web.NewHandlers(userService, repoService, browseService, issueService, pullService, gitAccess, gitBackend, sm)
 
 	handler := web.NewRouter(cfg, handlers)
 

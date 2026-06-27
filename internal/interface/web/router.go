@@ -57,6 +57,15 @@ func NewRouter(cfg config.Config, h *Handlers) http.Handler {
 	r.With(h.requireAuth).Post("/{owner}/{repo}/issues/{number}/close", h.closeIssue)
 	r.With(h.requireAuth).Post("/{owner}/{repo}/issues/{number}/reopen", h.reopenIssue)
 
+	r.Get("/{owner}/{repo}/pulls", h.pullsList)
+	r.Get("/{owner}/{repo}/compare", h.comparePull)
+	r.With(h.requireAuth).Get("/{owner}/{repo}/pulls/new", h.comparePull)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/pulls", h.createPull)
+	r.Get("/{owner}/{repo}/pulls/{number}", h.pullDetail)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/pulls/{number}/comments", h.addPullComment)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/pulls/{number}/merge", h.mergePull)
+	r.With(h.requireAuth).Post("/{owner}/{repo}/pulls/{number}/close", h.closePull)
+
 	return r
 }
 

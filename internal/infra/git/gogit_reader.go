@@ -250,6 +250,73 @@ func (g *GoGitReader) CommitDiff(ctx context.Context, owner, name, hash string) 
 		return nil, nil, mapErr(err)
 	}
 
+	return commitDTO(c), fileDiffs(patch), nil
+}
+
+func (g *GoGitReader) Compare(ctx context.Context, owner, name, base, head string) (*domain.Comparison, error) {
+	repo, err := g.open(owner, name)
+	if err != nil {
+		return nil, err
+	}
+	baseCommit, err := g.resolveCommit(repo, base)
+	if err != nil {
+		return nil, err
+	}
+	headCommit, err := g.resolveCommit(repo, head)
+	if err != nil {
+		return nil, err
+	}
+
+	var mb *object.Commit
+	if bases, err := baseCommit.MergeBase(headCommit); err == nil && len(bases) > 0 {
+		mb = bases[0]
+	}
+
+	var ahead []domain.Commit
+	iter, err := repo.Log(&gogit.LogOptions{From: headCommit.Hash})
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	err = iter.ForEach(func(c *object.Commit) error {
+		if mb != nil && c.Hash == mb.Hash {
+			return storerStop
+		}
+		ahead = append(ahead, *commitDTO(c))
+		return nil
+	})
+	iter.Close()
+	if err != nil && !errors.Is(err, storerStop) {
+		return nil, mapErr(err)
+	}
+
+	var baseTree *object.Tree
+	if mb != nil {
+		baseTree, err = mb.Tree()
+		if err != nil {
+			return nil, mapErr(err)
+		}
+	}
+	headTree, err := headCommit.Tree()
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	changes, err := object.DiffTree(baseTree, headTree)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	patch, err := changes.Patch()
+	if err != nil {
+		return nil, mapErr(err)
+	}
+
+	return &domain.Comparison{
+		Commits:   ahead,
+		Files:     fileDiffs(patch),
+		Mergeable: len(ahead) > 0,
+	}, nil
+}
+
+func fileDiffs(patch *object.Patch) []domain.FileDiff {
 	var diffs []domain.FileDiff
 	for _, fp := range patch.FilePatches() {
 		from, to := fp.Files()
@@ -269,13 +336,13 @@ func (g *GoGitReader) CommitDiff(ctx context.Context, owner, name, hash string) 
 					continue
 				}
 				switch chunk.Type() {
-				case 1: // Add
+				case 1:
 					sb.WriteString("+" + line)
 					added++
-				case 2: // Delete
+				case 2:
 					sb.WriteString("-" + line)
 					deleted++
-				default: // Equal
+				default:
 					sb.WriteString(" " + line)
 				}
 			}
@@ -287,8 +354,7 @@ func (g *GoGitReader) CommitDiff(ctx context.Context, owner, name, hash string) 
 			Deleted: deleted,
 		})
 	}
-
-	return commitDTO(c), diffs, nil
+	return diffs
 }
 
 var storerStop = errors.New("stop")

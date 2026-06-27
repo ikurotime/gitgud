@@ -1,0 +1,31 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ PullsList(user *domain.User, repo *domain.Repository, state string, prs []*domain.PullRequest, openCount, mergedCount, closedCount int) {
+	@Layout("Pull requests · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "pulls")
+			<div class="flex items-center justify-between mb-3">
+				<div class="flex gap-4 text-sm">
+					<a class={ stateTabClass(state, "open") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=open")) }>{ itoa(openCount) } Open</a>
+					<a class={ stateTabClass(state, "merged") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=merged")) }>{ itoa(mergedCount) } Merged</a>
+					<a class={ stateTabClass(state, "closed") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=closed")) }>{ itoa(closedCount) } Closed</a>
+				</div>
+				<a class="border px-3 py-1 text-sm" href={ templ.SafeURL(repoPath(repo, "/compare")) }>New pull request</a>
+			</div>
+			if len(prs) == 0 {
+				<p class="text-gray-500">No pull requests to show.</p>
+			} else {
+				<ul class="border">
+					for _, p := range prs {
+						<li class="border-b px-3 py-2">
+							<a href={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(p.Number))) }>{ p.Title }</a>
+							<div class="text-xs text-gray-500">#{ itoa(p.Number) } · { string(p.State) } · { p.HeadBranch } → { p.BaseBranch } · by { p.AuthorName }</div>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+}

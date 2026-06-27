@@ -23,6 +23,7 @@ type RepositoryRepository interface {
 type GitService interface {
 	InitBare(ctx context.Context, owner, name, defaultBranch string) error
 	RemovePath(ctx context.Context, owner, name string) error
+	Merge(ctx context.Context, owner, name, base, head, message, authorName, authorEmail string) error
 }
 
 type IssueRepository interface {
@@ -44,4 +45,16 @@ type GitReader interface {
 	Blob(ctx context.Context, owner, name, ref, path string) (*FileBlob, error)
 	Log(ctx context.Context, owner, name, ref string, limit, offset int) ([]Commit, error)
 	CommitDiff(ctx context.Context, owner, name, hash string) (*Commit, []FileDiff, error)
+	Compare(ctx context.Context, owner, name, base, head string) (*Comparison, error)
+}
+
+type PullRequestRepository interface {
+	Create(ctx context.Context, pr *PullRequest) error
+	ByNumber(ctx context.Context, repoID int64, number int) (*PullRequest, error)
+	List(ctx context.Context, repoID int64, state PRState) ([]*PullRequest, error)
+	SetState(ctx context.Context, id int64, state PRState) error
+
+	AddComment(ctx context.Context, c *PRComment) error
+	Comments(ctx context.Context, prID int64) ([]*PRComment, error)
+	CountByState(ctx context.Context, repoID int64) (open, merged, closed int, err error)
 }

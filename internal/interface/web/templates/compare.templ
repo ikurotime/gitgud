@@ -1,0 +1,52 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ Compare(user *domain.User, repo *domain.Repository, base, head string, branches []string, cmp *domain.Comparison, errMsg string) {
+	@Layout("Compare · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "pulls")
+			<h2 class="text-lg mb-3">Compare changes</h2>
+			if errMsg != "" {
+				<p class="text-red-600 mb-3">{ errMsg }</p>
+			}
+			<form method="get" action={ templ.SafeURL(repoPath(repo, "/compare")) } class="flex items-center gap-2 mb-4 text-sm">
+				<span>base</span>
+				<select name="base" class="border px-2 py-1">
+					@branchOptions(branches, base)
+				</select>
+				<span>←</span>
+				<span>compare</span>
+				<select name="head" class="border px-2 py-1">
+					<option value="">select branch</option>
+					@branchOptions(branches, head)
+				</select>
+				<button class="border px-3 py-1" type="submit">Compare</button>
+			</form>
+			if cmp != nil {
+				<div class="mb-4 text-sm text-gray-600">{ itoa(len(cmp.Commits)) } commit(s), { itoa(len(cmp.Files)) } file(s) changed</div>
+				if user != nil && cmp.Mergeable {
+					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls")) } class="flex flex-col gap-3 mb-6 border p-3">
+						<input type="hidden" name="base" value={ base }/>
+						<input type="hidden" name="head" value={ head }/>
+						<input class="border px-2 py-1" type="text" name="title" placeholder="Title" value={ head }/>
+						<textarea class="border px-2 py-1" name="body" rows="5" placeholder="Description (markdown supported)"></textarea>
+						<div><button class="border px-3 py-1" type="submit">Create pull request</button></div>
+					</form>
+				}
+				@commitsList(repo, cmp.Commits)
+				@diffFiles(cmp.Files)
+			}
+		</div>
+	}
+}
+
+templ branchOptions(branches []string, selected string) {
+	for _, b := range branches {
+		if b == selected {
+			<option value={ b } selected>{ b }</option>
+		} else {
+			<option value={ b }>{ b }</option>
+		}
+	}
+}

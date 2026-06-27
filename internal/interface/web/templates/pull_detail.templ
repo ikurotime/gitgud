@@ -1,0 +1,52 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ PullDetail(user *domain.User, repo *domain.Repository, pr *domain.PullRequest, cmp *domain.Comparison, comments []*domain.PRComment, canMerge bool, errMsg string) {
+	@Layout(pr.Title+" · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "pulls")
+			<div class="flex items-center gap-2 mb-1">
+				<h2 class="text-xl">{ pr.Title } <span class="text-gray-400">#{ itoa(pr.Number) }</span></h2>
+				<span class="text-xs border px-2 py-0.5">{ string(pr.State) }</span>
+			</div>
+			<div class="text-xs text-gray-500 mb-4">
+				{ pr.AuthorName } wants to merge <code>{ pr.HeadBranch }</code> into <code>{ pr.BaseBranch }</code>
+			</div>
+			if errMsg != "" {
+				<p class="text-red-600 mb-3">{ errMsg }</p>
+			}
+			@commentCard(pr.AuthorName, fmtTime(pr.CreatedAt), pr.Body)
+			for _, c := range comments {
+				@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
+			}
+			<div class="border p-3 mb-4">
+				if pr.State == domain.PRMerged {
+					<div class="text-purple-700">This pull request was merged.</div>
+				} else if pr.State == domain.PRClosed {
+					<div class="text-gray-600">This pull request was closed.</div>
+				} else if canMerge {
+					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/merge")) }>
+						<button class="border px-3 py-1 bg-green-700 text-white" type="submit">Merge pull request</button>
+					</form>
+				} else if user != nil {
+					<div class="text-gray-600">You cannot merge this pull request.</div>
+				} else {
+					<div class="text-gray-600"><a href="/login">Sign in</a> to act on this pull request.</div>
+				}
+			</div>
+			if cmp != nil {
+				<h3 class="text-md mb-2">Commits</h3>
+				@commitsList(repo, cmp.Commits)
+				<h3 class="text-md mb-2">Files changed</h3>
+				@diffFiles(cmp.Files)
+			}
+			if user != nil {
+				<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/comments")) } class="flex flex-col gap-2 mt-4">
+					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
+					<div><button class="border px-3 py-1" type="submit">Comment</button></div>
+				</form>
+			}
+		</div>
+	}
+}
