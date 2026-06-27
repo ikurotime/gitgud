@@ -1,0 +1,25 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ BrowseBlob(user *domain.User, repo *domain.Repository, ref string, blob *domain.FileBlob, highlighted string) {
+	@Layout(blob.Path+" · gitgud", user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "code")
+			<div class="flex items-center justify-between mb-2">
+				<div class="text-sm font-mono">{ blob.Path }</div>
+				<div class="flex gap-3 text-sm">
+					<span class="text-gray-500">{ humanSize(blob.Size) }</span>
+					<a href={ templ.SafeURL(repoPath(repo, "/raw/"+ref+"/"+blob.Path)) }>Raw</a>
+				</div>
+			</div>
+			if blob.IsBinary {
+				<div class="border p-4 text-gray-500">Binary file not shown.</div>
+			} else {
+				<div class="border overflow-x-auto text-sm">
+					@templ.Raw(highlighted)
+				</div>
+			}
+		</div>
+	}
+}

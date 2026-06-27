@@ -1,0 +1,43 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ repoHeader(repo *domain.Repository, active string) {
+	<div class="border-b mb-4 pb-2">
+		<div class="flex items-center gap-2 mb-2">
+			<h1 class="text-xl">
+				<a href={ templ.SafeURL("/" + repo.OwnerName) }>{ repo.OwnerName }</a>
+				<span>/</span>
+				<a class="font-semibold" href={ templ.SafeURL(repoPath(repo, "")) }>{ repo.Name }</a>
+			</h1>
+			if repo.IsPrivate {
+				<span class="text-xs border px-1">private</span>
+			}
+		</div>
+		<nav class="flex gap-4 text-sm">
+			@repoTab(repoPath(repo, ""), "Code", active == "code")
+			@repoTab(repoPath(repo, "/issues"), "Issues", active == "issues")
+			@repoTab(repoPath(repo, "/pulls"), "Pulls", active == "pulls")
+		</nav>
+	</div>
+}
+
+templ repoTab(href, label string, current bool) {
+	if current {
+		<a class="font-bold border-b-2 border-black pb-1" href={ templ.SafeURL(href) }>{ label }</a>
+	} else {
+		<a class="pb-1 text-gray-600" href={ templ.SafeURL(href) }>{ label }</a>
+	}
+}
+
+templ branchSwitcher(repo *domain.Repository, ref string, branches []string) {
+	<select class="border px-2 py-1 text-sm" onchange="location.href=this.value">
+		for _, b := range branches {
+			if b == ref {
+				<option value={ repoPath(repo, "/tree/" + b) } selected>{ b }</option>
+			} else {
+				<option value={ repoPath(repo, "/tree/" + b) }>{ b }</option>
+			}
+		}
+	</select>
+}

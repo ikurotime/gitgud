@@ -1,0 +1,23 @@
+package templates
+
+import "gitgud/internal/domain"
+
+templ Commits(user *domain.User, repo *domain.Repository, ref string, commits []domain.Commit) {
+	@Layout("Commits · "+repo.Name, user) {
+		<div class="max-w-3xl mx-auto">
+			@repoHeader(repo, "code")
+			<h2 class="text-lg mb-3">Commits on { ref }</h2>
+			<ul class="border">
+				for _, c := range commits {
+					<li class="border-b px-3 py-2 flex items-center justify-between">
+						<div>
+							<a class="block" href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ firstLine(c.Message) }</a>
+							<span class="text-xs text-gray-500">{ c.Author }</span>
+						</div>
+						<code class="text-xs">{ c.ShortHash }</code>
+					</li>
+				}
+			</ul>
+		</div>
+	}
+}
