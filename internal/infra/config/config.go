@@ -27,9 +27,14 @@ func Load() (Config, error) {
 		return Config{}, err
 	}
 
+	dataDir, err := filepath.Abs(os.Getenv("GITGUD_DATA_DIR"))
+	if err != nil {
+		return Config{}, err
+	}
+
 	return Config{
 		Addr:       os.Getenv("GITGUD_ADDR"),
-		DataDir:    os.Getenv("GITGUD_DATA_DIR"),
+		DataDir:    dataDir,
 		SessionKey: os.Getenv("GITGUD_SESSION_KEY"),
 	}, nil
 }
