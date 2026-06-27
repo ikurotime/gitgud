@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+//go:embed migrations/*.sql
 var migrationsFS embed.FS
 
 func Open(dbPath string) (*sql.DB, error) {
@@ -24,20 +25,20 @@ func Open(dbPath string) (*sql.DB, error) {
 }
 
 func migrate(db *sql.DB) error {
-	migrations, err := migrationsFS.ReadDir(".")
+	migrations, err := migrationsFS.ReadDir("migrations")
 	if err != nil {
 		return err
 	}
 	for _, migration := range migrations {
-		if !migration.IsDir() {
-			content, err := migrationsFS.ReadFile(migration.Name())
-			if err != nil {
-				return err
-			}
-			_, err = db.Exec(string(content))
-			if err != nil {
-				return err
-			}
+		if migration.IsDir() {
+			continue
+		}
+		content, err := migrationsFS.ReadFile("migrations/" + migration.Name())
+		if err != nil {
+			return err
+		}
+		if _, err := db.Exec(string(content)); err != nil {
+			return err
 		}
 	}
 	return nil
