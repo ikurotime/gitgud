@@ -43,7 +43,7 @@ func NotFound(user *domain.User) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto\"><h1 class=\"text-2xl mb-2\">404</h1><p>The page you're looking for doesn't exist.</p></div>")
+			templ_7745c5c3_Err = errorState("404", "This page doesn't exist", "The page you're looking for can't be found, or you don't have access to it.").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

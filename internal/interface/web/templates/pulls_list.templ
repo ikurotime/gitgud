@@ -4,28 +4,41 @@ import "gitgud/internal/domain"
 
 templ PullsList(user *domain.User, repo *domain.Repository, state string, prs []*domain.PullRequest, openCount, mergedCount, closedCount int) {
 	@Layout("Pull requests · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "pulls")
-			<div class="flex items-center justify-between mb-3">
-				<div class="flex gap-4 text-sm">
-					<a class={ stateTabClass(state, "open") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=open")) }>{ itoa(openCount) } Open</a>
-					<a class={ stateTabClass(state, "merged") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=merged")) }>{ itoa(mergedCount) } Merged</a>
-					<a class={ stateTabClass(state, "closed") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=closed")) }>{ itoa(closedCount) } Closed</a>
-				</div>
-				<a class="border px-3 py-1 text-sm" href={ templ.SafeURL(repoPath(repo, "/compare")) }>New pull request</a>
+		@repoHeader(repo, "pulls")
+		<div class="mb-4 flex items-center justify-between">
+			<div class="flex gap-5 text-sm">
+				<a class={ stateTabClass(state, "open") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=open")) }>{ itoa(openCount) } Open</a>
+				<a class={ stateTabClass(state, "merged") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=merged")) }>{ itoa(mergedCount) } Merged</a>
+				<a class={ stateTabClass(state, "closed") } href={ templ.SafeURL(repoPath(repo, "/pulls?state=closed")) }>{ itoa(closedCount) } Closed</a>
 			</div>
-			if len(prs) == 0 {
-				<p class="text-gray-500">No pull requests to show.</p>
-			} else {
-				<ul class="border">
-					for _, p := range prs {
-						<li class="border-b px-3 py-2">
-							<a href={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(p.Number))) }>{ p.Title }</a>
-							<div class="text-xs text-gray-500">#{ itoa(p.Number) } · { string(p.State) } · { p.HeadBranch } → { p.BaseBranch } · by { p.AuthorName }</div>
-						</li>
-					}
-				</ul>
-			}
+			<a class="btn btn-primary" href={ templ.SafeURL(repoPath(repo, "/compare")) }>+ New pull request</a>
 		</div>
+		if len(prs) == 0 {
+			@emptyState("No pull requests", "There are no "+state+" pull requests in this repository.", "", "")
+		} else {
+			<div class="card overflow-hidden">
+				for _, p := range prs {
+					<div class="row border-b border-line px-4 py-3 last:border-0">
+						<a class="flex items-start gap-2.5" href={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(p.Number))) }>
+							@prDot(string(p.State))
+							<span class="min-w-0">
+								<span class="block text-ink hover:text-accent">{ p.Title }</span>
+								<span class="meta">#{ itoa(p.Number) } · <span class="font-mono">{ p.HeadBranch }</span> → <span class="font-mono">{ p.BaseBranch }</span> · by { p.AuthorName }</span>
+							</span>
+						</a>
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ prDot(state string) {
+	if state == "open" {
+		<span class="mt-1 size-3.5 shrink-0 rounded-full border-2 border-accent"></span>
+	} else if state == "merged" {
+		<span class="mt-1 size-3.5 shrink-0 rounded-full border-2 border-merged"></span>
+	} else {
+		<span class="mt-1 size-3.5 shrink-0 rounded-full border-2 border-faint"></span>
 	}
 }

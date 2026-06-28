@@ -4,31 +4,35 @@ import "gitgud/internal/domain"
 
 templ NewRepo(user *domain.User, name, description string, private bool, errMsg string) {
 	@Layout("New repository · gitgud", user) {
-		<div class="max-w-md mx-auto">
-			<h1 class="text-2xl mb-4">New repository</h1>
-			if errMsg != "" {
-				<p class="text-red-600 mb-3">{ errMsg }</p>
-			}
-			<form method="post" action="/new" class="flex flex-col gap-3">
-				@csrfField()
-				<label class="flex flex-col gap-1">
-					<span>Name</span>
-					<input class="border px-2 py-1" type="text" name="name" value={ name } autofocus/>
-				</label>
-				<label class="flex flex-col gap-1">
-					<span>Description</span>
-					<input class="border px-2 py-1" type="text" name="description" value={ description }/>
-				</label>
-				<label class="flex items-center gap-2">
-					if private {
-						<input type="checkbox" name="private" checked/>
-					} else {
-						<input type="checkbox" name="private"/>
-					}
-					<span>Private</span>
-				</label>
-				<button class="border px-3 py-1" type="submit">Create repository</button>
-			</form>
+		<div class="mx-auto max-w-lg">
+			<h1 class="mb-1 text-xl font-semibold tracking-tight">Create a new repository</h1>
+			<p class="mb-6 text-sm text-muted">A repository contains all your project's files and history.</p>
+			<div class="card p-6">
+				if errMsg != "" {
+					<div class="mb-4 rounded-md border border-closed/30 bg-closed/10 px-3 py-2 text-sm text-closed">{ errMsg }</div>
+				}
+				<form method="post" action="/new" class="flex flex-col gap-4">
+					@csrfField()
+					<label class="flex flex-col gap-1.5">
+						<span class="text-xs font-medium text-muted">Repository name</span>
+						<input class="input font-mono" type="text" name="name" value={ name } placeholder="my-project" autofocus/>
+					</label>
+					<label class="flex flex-col gap-1.5">
+						<span class="text-xs font-medium text-muted">Description <span class="text-faint">(optional)</span></span>
+						<input class="input" type="text" name="description" value={ description }/>
+					</label>
+					<label class="flex cursor-pointer items-center gap-2.5 rounded-md border border-line bg-panel2 px-3 py-2.5">
+						if private {
+							<input type="checkbox" name="private" class="accent-accent" checked/>
+						} else {
+							<input type="checkbox" name="private" class="accent-accent"/>
+						}
+						<span class="text-sm text-ink">Private</span>
+						<span class="text-xs text-faint">— only you can see it</span>
+					</label>
+					<button class="btn btn-primary mt-1 justify-center" type="submit">Create repository</button>
+				</form>
+			</div>
 		</div>
 	}
 }

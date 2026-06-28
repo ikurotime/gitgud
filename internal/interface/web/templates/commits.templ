@@ -4,20 +4,21 @@ import "gitgud/internal/domain"
 
 templ Commits(user *domain.User, repo *domain.Repository, ref string, commits []domain.Commit) {
 	@Layout("Commits · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "code")
-			<h2 class="text-lg mb-3">Commits on { ref }</h2>
-			<ul class="border">
-				for _, c := range commits {
-					<li class="border-b px-3 py-2 flex items-center justify-between">
-						<div>
-							<a class="block" href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ firstLine(c.Message) }</a>
-							<span class="text-xs text-gray-500">{ c.Author }</span>
-						</div>
-						<code class="text-xs">{ c.ShortHash }</code>
-					</li>
-				}
-			</ul>
+		@repoHeader(repo, "code")
+		<div class="mb-4 flex items-center gap-2 text-sm">
+			<span class="text-muted">Commits on</span>
+			<span class="badge font-mono">{ ref }</span>
+		</div>
+		<div class="card overflow-hidden">
+			for _, c := range commits {
+				<div class="row flex items-center justify-between border-b border-line px-4 py-3 last:border-0">
+					<div class="min-w-0">
+						<a class="block truncate text-ink hover:text-accent" href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ firstLine(c.Message) }</a>
+						<div class="meta mt-0.5">{ c.Author } · { fmtTime(c.When) }</div>
+					</div>
+					<a class="ml-4 shrink-0 rounded-md border border-line2 bg-panel2 px-2 py-1 font-mono text-xs text-muted hover:text-ink" href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ c.ShortHash }</a>
+				</div>
+			}
 		</div>
 	}
 }

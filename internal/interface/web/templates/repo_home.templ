@@ -4,21 +4,17 @@ import "gitgud/internal/domain"
 
 templ RepoHome(user *domain.User, repo *domain.Repository) {
 	@Layout(repo.OwnerName+"/"+repo.Name+" · gitgud", user) {
-		<div class="max-w-2xl mx-auto">
-			<div class="flex items-center gap-2 mb-4">
-				<h1 class="text-2xl">
-					<a href={ templ.SafeURL("/" + repo.OwnerName) }>{ repo.OwnerName }</a> / { repo.Name }
-				</h1>
-				if repo.IsPrivate {
-					<span class="text-xs border px-1">private</span>
-				}
+		@repoHeader(repo, "code")
+		if repo.Description != "" {
+			<p class="mb-6 text-sm text-muted">{ repo.Description }</p>
+		}
+		<div class="card overflow-hidden">
+			<div class="border-b border-line px-5 py-3">
+				<h2 class="font-semibold text-ink">Quick setup</h2>
+				<p class="meta mt-0.5">This repository is empty. Push your first commit to get started.</p>
 			</div>
-			if repo.Description != "" {
-				<p class="mb-4 text-gray-600">{ repo.Description }</p>
-			}
-			<div class="border p-4">
-				<h2 class="mb-2">Quick setup — create a repo on the command line</h2>
-				<pre class="bg-gray-100 p-3 text-sm overflow-x-auto">{ cloneInstructions(repo) }</pre>
+			<div class="bg-panel2 p-5">
+				<pre class="overflow-x-auto font-mono text-xs leading-relaxed text-muted">{ cloneInstructions(repo) }</pre>
 			</div>
 		</div>
 	}

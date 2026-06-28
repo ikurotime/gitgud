@@ -4,28 +4,18 @@ import "gitgud/internal/domain"
 
 templ CommitDetail(user *domain.User, repo *domain.Repository, commit *domain.Commit, diffs []domain.FileDiff) {
 	@Layout("Commit "+commit.ShortHash+" · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "code")
-			<div class="border p-3 mb-4">
-				<div class="font-medium">{ firstLine(commit.Message) }</div>
-				<div class="text-xs text-gray-500">{ commit.Author } · <code>{ commit.Hash }</code></div>
+		@repoHeader(repo, "code")
+		<div class="card mb-5 overflow-hidden">
+			<div class="border-b border-line px-4 py-3">
+				<div class="text-base font-semibold text-ink">{ firstLine(commit.Message) }</div>
 			</div>
-			for _, d := range diffs {
-				<div class="border mb-4">
-					<div class="bg-gray-100 px-3 py-1 text-sm flex justify-between">
-						<span class="font-mono">{ d.Path }</span>
-						<span class="text-xs">
-							<span class="text-green-700">+{ itoa(d.Added) }</span>
-							<span class="text-red-700">-{ itoa(d.Deleted) }</span>
-						</span>
-					</div>
-					<div class="font-mono text-xs overflow-x-auto">
-						for _, line := range diffLines(d.Patch) {
-							<div class={ "whitespace-pre px-3 " + diffLineClass(line) }>{ line }</div>
-						}
-					</div>
-				</div>
-			}
+			<div class="flex items-center gap-2.5 px-4 py-3 text-xs text-muted">
+				@avatar(commit.Author, "size-5")
+				<span class="font-medium text-ink">{ commit.Author }</span>
+				<span>committed on { fmtTime(commit.When) }</span>
+				<span class="ml-auto font-mono text-faint">commit <span class="text-accent">{ commit.ShortHash }</span></span>
+			</div>
 		</div>
+		@diffFiles(diffs)
 	}
 }

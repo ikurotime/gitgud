@@ -4,19 +4,23 @@ import "gitgud/internal/domain"
 
 templ BrowseBlob(user *domain.User, repo *domain.Repository, ref string, blob *domain.FileBlob, highlighted string) {
 	@Layout(blob.Path+" · gitgud", user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "code")
-			<div class="flex items-center justify-between mb-2">
-				<div class="text-sm font-mono">{ blob.Path }</div>
-				<div class="flex gap-3 text-sm">
-					<span class="text-gray-500">{ humanSize(blob.Size) }</span>
-					<a href={ templ.SafeURL(repoPath(repo, "/raw/"+ref+"/"+blob.Path)) }>Raw</a>
-				</div>
+		@repoHeader(repo, "code")
+		<div class="mb-3 flex items-center gap-2 font-mono text-sm">
+			<span class="inline-flex items-center gap-2 rounded-md border border-line2 bg-panel2 px-2.5 py-1 text-xs text-ink">
+				<span class="inline-block size-2 rounded-full border-[1.5px] border-accent"></span>{ ref }
+			</span>
+			<span class="text-faint">/</span>
+			<span class="text-accent">{ blob.Path }</span>
+		</div>
+		<div class="card overflow-hidden">
+			<div class="flex items-center justify-between border-b border-line bg-[#0e1410] px-4 py-2.5 font-mono text-xs text-muted">
+				<span>{ humanSize(blob.Size) } · <span class="text-accent">{ langLabel(blob.Path) }</span></span>
+				<a class="rounded border border-line2 px-2.5 py-1 text-ink transition hover:border-faint hover:bg-panel2" href={ templ.SafeURL(repoPath(repo, "/raw/"+ref+"/"+blob.Path)) }>Raw</a>
 			</div>
 			if blob.IsBinary {
-				<div class="border p-4 text-gray-500">Binary file not shown.</div>
+				<div class="px-4 py-10 text-center text-sm text-faint">Binary file not shown.</div>
 			} else {
-				<div class="border overflow-x-auto text-sm">
+				<div class="overflow-x-auto bg-[#0a0e0b] text-xs leading-relaxed [&_pre]:!bg-transparent">
 					@templ.Raw(highlighted)
 				</div>
 			}

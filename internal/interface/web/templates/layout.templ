@@ -4,35 +4,131 @@ import "gitgud/internal/domain"
 
 templ Layout(title string, user *domain.User) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="dark">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title }</title>
-			<link rel="stylesheet" href="/static/css/main.css"/>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 			<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+			<style type="text/tailwindcss">
+				@theme {
+					--color-canvas: #080b09;
+					--color-panel: #0b100d;
+					--color-panel2: #141b16;
+					--color-line: #1e2820;
+					--color-line2: #25342a;
+					--color-ink: #eef4ef;
+					--color-muted: #8a978c;
+					--color-faint: #54605c;
+					--color-accent: #3fcf7f;
+					--color-accenthi: #6fe0a0;
+					--color-grass: #2ea04a;
+					--color-grasshi: #34b554;
+					--color-grassink: #06120a;
+					--color-open: #3fcf7f;
+					--color-closed: #ff7066;
+					--color-merged: #a371f7;
+					--color-warn: #e0c060;
+					--font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+					--font-mono: "JetBrains Mono", ui-monospace, monospace;
+				}
+				@layer base {
+					html { color-scheme: dark; }
+					body { @apply bg-canvas text-ink font-sans antialiased; }
+					body::before {
+						content: "";
+						position: fixed;
+						inset: 0;
+						pointer-events: none;
+						z-index: 0;
+						background: radial-gradient(680px 320px at 50% -120px, rgba(63,207,127,.12), transparent 70%);
+					}
+					a { @apply transition-colors; }
+					code, pre, .mono { @apply font-mono; }
+					::selection { background: rgba(63,207,127,.30); }
+					::-webkit-scrollbar { width: 10px; height: 10px; }
+					::-webkit-scrollbar-thumb { background: #25342a; border-radius: 9999px; border: 2px solid #080b09; }
+					:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(63,207,127,.55); border-radius: 6px; }
+					main { animation: rise .42s cubic-bezier(.22,1,.36,1) both; }
+					@keyframes rise { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+				}
+				@layer components {
+					.btn { @apply inline-flex items-center gap-1.5 rounded-md border border-line2 bg-panel2 px-3 py-1.5 text-sm font-medium text-ink transition hover:border-faint hover:bg-line; }
+					.btn-primary { @apply border-transparent bg-grass font-semibold text-grassink shadow-[0_0_0_1px_rgba(46,160,74,.5),0_6px_20px_-10px_rgba(63,207,127,.8)] hover:bg-grasshi hover:border-transparent; }
+					.btn-danger { @apply text-closed hover:border-closed hover:bg-closed/10; }
+					.input, .textarea, .select { @apply w-full rounded-md border border-line2 bg-[#0e1410] px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-accent; }
+					.card { @apply rounded-md border border-line bg-panel; }
+					.link { @apply text-ink hover:text-accent; }
+					.muted { @apply text-muted; }
+					.meta { @apply font-mono text-xs text-faint; }
+					.tab { @apply inline-flex items-center gap-2 border-b-2 border-transparent pb-2.5 text-sm text-muted transition hover:text-ink; }
+					.tab-active { @apply border-accent font-semibold text-ink; }
+					.badge { @apply inline-flex items-center gap-1 rounded border border-line2 px-2 py-0.5 text-xs font-medium text-muted; }
+					.badge-open { @apply gap-1.5 rounded-full border-transparent bg-grass px-3 py-1 font-semibold text-grassink; }
+					.badge-closed { @apply gap-1.5 rounded-full border-transparent bg-closed/16 px-3 py-1 font-medium text-[#ff8f86]; }
+					.badge-merged { @apply gap-1.5 rounded-full border-transparent bg-merged/16 px-3 py-1 font-medium text-[#c8a6f7]; }
+					.label-bug { @apply inline-flex items-center rounded-full bg-closed/16 px-2.5 py-0.5 text-[10px] font-medium text-[#ff8f86]; }
+					.label-enh { @apply inline-flex items-center rounded-full bg-accent/16 px-2.5 py-0.5 text-[10px] font-medium text-accenthi; }
+					.label-good { @apply inline-flex items-center rounded-full bg-warn/16 px-2.5 py-0.5 text-[10px] font-medium text-warn; }
+					.row { @apply transition hover:bg-panel2; }
+					.diff-add { @apply bg-accent/12 text-[#aee6c4]; }
+					.diff-del { @apply bg-closed/12 text-[#f2b8b3]; }
+					.diff-hunk { @apply bg-[#10171b] text-[#5aa0c8]; }
+					.prose-dark { @apply text-sm leading-relaxed text-muted; }
+					.prose-dark h1 { @apply mt-5 mb-3 text-xl font-semibold text-ink first:mt-0; }
+					.prose-dark h2 { @apply mt-5 mb-2 text-lg font-semibold text-ink first:mt-0; }
+					.prose-dark h3 { @apply mt-4 mb-2 font-semibold text-ink; }
+					.prose-dark p { @apply my-3; }
+					.prose-dark a { @apply text-accent hover:underline; }
+					.prose-dark strong { @apply font-semibold text-ink; }
+					.prose-dark ul { @apply my-3 list-disc pl-5; }
+					.prose-dark ol { @apply my-3 list-decimal pl-5; }
+					.prose-dark li { @apply my-1; }
+					.prose-dark code { @apply rounded border border-line2 bg-panel2 px-1.5 py-0.5 text-[.85em] text-accent; }
+					.prose-dark pre { @apply my-3 overflow-x-auto rounded-lg border border-line bg-panel2 p-4 text-xs; }
+					.prose-dark pre code { @apply bg-transparent p-0; }
+					.prose-dark blockquote { @apply my-3 border-l-2 border-line2 pl-4 text-faint; }
+					.prose-dark hr { @apply my-5 border-line; }
+				}
+			</style>
 		</head>
 		<body>
-			<nav class="flex items-center justify-between px-6 py-3 border-b">
-				<a href="/" class="font-bold">gitgud</a>
-				<div class="flex items-center gap-4">
-					if user != nil {
-						<a href="/new">New</a>
-						<span>{ user.Username }</span>
-						<form method="post" action="/logout">
-							@csrfField()
-							<button type="submit">Sign out</button>
-						</form>
-					} else {
-						<a href="/login">Sign in</a>
-						<a href="/register">Register</a>
-					}
-				</div>
-			</nav>
+			<header class="sticky top-0 z-20 border-b border-line bg-canvas/80 backdrop-blur-xl">
+				<nav class="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
+					<a href="/" class="flex items-center gap-2.5">
+						<span class="text-accent">@gitLogo("size-5")</span>
+						<span class="font-mono font-semibold tracking-tight text-ink">gitgud</span>
+					</a>
+					<div class="flex items-center gap-4 text-sm">
+						if user != nil {
+							<a class="btn" href="/new">+ New</a>
+							<div class="flex items-center gap-2">
+								@avatar(user.Username, "size-6")
+								<a class="link mono text-muted" href={ templ.SafeURL("/" + user.Username) }>{ user.Username }</a>
+							</div>
+							<form method="post" action="/logout">
+								@csrfField()
+								<button class="text-muted transition hover:text-ink" type="submit">Sign out</button>
+							</form>
+						} else {
+							<a class="text-muted transition hover:text-ink" href="/login">Sign in</a>
+							<a class="btn btn-primary" href="/register">Register</a>
+						}
+					</div>
+				</nav>
+			</header>
 			if flashOf(ctx) != "" {
-				<div class="px-6 py-2 bg-blue-50 border-b border-blue-200 text-blue-800 text-sm">{ flashOf(ctx) }</div>
+				<div class="mx-auto max-w-5xl px-6 pt-4">
+					<div class="card flex items-center gap-2 border-accent/30 bg-accent/10 px-4 py-2.5 text-sm text-ink">
+						<span class="size-1.5 rounded-full bg-accent"></span>
+						{ flashOf(ctx) }
+					</div>
+				</div>
 			}
-			<main class="p-6">
+			<main class="relative z-10 mx-auto max-w-5xl px-6 py-8">
 				{ children... }
 			</main>
 		</body>
@@ -41,4 +137,23 @@ templ Layout(title string, user *domain.User) {
 
 templ csrfField() {
 	<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+}
+
+// gitLogo renders the gitgud branch-network mark. Color is inherited via currentColor.
+templ gitLogo(class string) {
+	<svg class={ class } viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<circle cx="6" cy="5.5" r="2.5"></circle>
+		<circle cx="6" cy="18.5" r="2.5"></circle>
+		<circle cx="18" cy="12" r="2.5"></circle>
+		<path d="M6 8v8"></path>
+		<path d="M6 12h6.5a3 3 0 0 0 3-3V9.5"></path>
+	</svg>
+}
+
+// avatar renders a deterministic gradient avatar with the user's initial.
+templ avatar(name, class string) {
+	<span
+		class={ "inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-[#1f7a48] font-semibold text-grassink", class }
+		style="font-size:.62em"
+	>{ initial(name) }</span>
 }

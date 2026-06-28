@@ -4,30 +4,46 @@ import "gitgud/internal/domain"
 
 templ diffFiles(files []domain.FileDiff) {
 	for _, d := range files {
-		<div class="border mb-4">
-			<div class="bg-gray-100 px-3 py-1 text-sm flex justify-between">
-				<span class="font-mono">{ d.Path }</span>
-				<span class="text-xs">
-					<span class="text-green-700">+{ itoa(d.Added) }</span>
-					<span class="text-red-700">-{ itoa(d.Deleted) }</span>
+		<div class="card mb-4 overflow-hidden">
+			<div class="flex items-center gap-3 border-b border-line bg-[#0e1410] px-4 py-2.5">
+				<span class="font-mono text-sm text-ink">{ d.Path }</span>
+				<span class="ml-auto flex items-center gap-2 font-mono text-xs">
+					<span class="text-open">+{ itoa(d.Added) }</span>
+					<span class="text-closed">−{ itoa(d.Deleted) }</span>
 				</span>
+				@statSquares(d.Added, d.Deleted)
 			</div>
-			<div class="font-mono text-xs overflow-x-auto">
+			<div class="overflow-x-auto bg-panel2 font-mono text-xs leading-relaxed">
 				for _, line := range diffLines(d.Patch) {
-					<div class={ "whitespace-pre px-3 " + diffLineClass(line) }>{ line }</div>
+					<div class={ "whitespace-pre px-4 " + diffLineClass(line) }>{ line }</div>
 				}
 			</div>
 		</div>
 	}
 }
 
-templ commitsList(repo *domain.Repository, commits []domain.Commit) {
-	<ul class="border mb-4">
-		for _, c := range commits {
-			<li class="border-b px-3 py-2 flex items-center justify-between">
-				<a href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ firstLine(c.Message) }</a>
-				<code class="text-xs">{ c.ShortHash }</code>
-			</li>
+templ statSquares(added, deleted int) {
+	<span class="flex gap-px">
+		for _, kind := range statBlocks(added, deleted) {
+			switch kind {
+				case "add":
+					<span class="size-2.5 bg-open"></span>
+				case "del":
+					<span class="size-2.5 bg-closed"></span>
+				default:
+					<span class="size-2.5 bg-line2"></span>
+			}
 		}
-	</ul>
+	</span>
+}
+
+templ commitsList(repo *domain.Repository, commits []domain.Commit) {
+	<div class="card mb-4 overflow-hidden">
+		for _, c := range commits {
+			<div class="row flex items-center justify-between border-b border-line px-4 py-2.5 last:border-0">
+				<a class="truncate text-sm text-ink hover:text-accent" href={ templ.SafeURL(repoPath(repo, "/commit/"+c.Hash)) }>{ firstLine(c.Message) }</a>
+				<code class="ml-4 shrink-0 text-xs text-faint">{ c.ShortHash }</code>
+			</div>
+		}
+	</div>
 }

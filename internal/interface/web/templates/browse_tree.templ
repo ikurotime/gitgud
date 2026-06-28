@@ -4,33 +4,38 @@ import "gitgud/internal/domain"
 
 templ BrowseTree(user *domain.User, repo *domain.Repository, ref, path string, branches []string, entries []domain.TreeEntry, readme string) {
 	@Layout(repo.OwnerName+"/"+repo.Name+" · gitgud", user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "code")
-			<div class="flex items-center justify-between mb-3">
+		@repoHeader(repo, "code")
+		<div class="mb-3 flex items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
 				@branchSwitcher(repo, ref, branches)
-				<a class="text-sm" href={ templ.SafeURL(repoPath(repo, "/commits/"+ref)) }>Commits</a>
-			</div>
-			<div class="text-sm mb-2">
-				for i, c := range treeCrumbs(repo, ref, path) {
-					if i > 0 {
-						<span class="text-gray-400"> / </span>
+				<div class="font-mono text-sm">
+					for i, c := range treeCrumbs(repo, ref, path) {
+						if i > 0 {
+							<span class="text-faint"> / </span>
+						}
+						<a class="link" href={ templ.SafeURL(c.Href) }>{ c.Name }</a>
 					}
-					<a href={ templ.SafeURL(c.Href) }>{ c.Name }</a>
-				}
+				</div>
 			</div>
-			<table class="w-full border mb-6 text-sm">
+			<a class="meta hover:text-ink" href={ templ.SafeURL(repoPath(repo, "/commits/"+ref)) }>Commits →</a>
+		</div>
+		<div class="card overflow-hidden">
+			<table class="w-full text-sm">
 				<tbody>
 					for _, e := range entries {
-						<tr class="border-b">
-							<td class="px-2 py-1">
-								if e.IsDir {
-									<span>📁</span>
-								} else {
-									<span>📄</span>
-								}
-								<a href={ templ.SafeURL(entryHref(repo, ref, e)) }>{ e.Name }</a>
+						<tr class="row border-b border-line last:border-0">
+							<td class="px-4 py-2.5">
+								<a class="flex items-center gap-2.5" href={ templ.SafeURL(entryHref(repo, ref, e)) }>
+									if e.IsDir {
+										<span class="text-accent">▸</span>
+										<span class="font-mono text-ink">{ e.Name }</span>
+									} else {
+										<span class="text-faint">·</span>
+										<span class="font-mono text-muted">{ e.Name }</span>
+									}
+								</a>
 							</td>
-							<td class="px-2 py-1 text-right text-gray-500">
+							<td class="px-4 py-2.5 text-right font-mono text-xs text-faint">
 								if !e.IsDir {
 									{ humanSize(e.Size) }
 								}
@@ -39,11 +44,14 @@ templ BrowseTree(user *domain.User, repo *domain.Repository, ref, path string, b
 					}
 				</tbody>
 			</table>
-			if readme != "" {
-				<div class="border p-4">
+		</div>
+		if readme != "" {
+			<div class="card mt-6 overflow-hidden">
+				<div class="border-b border-line px-5 py-2.5 font-mono text-xs text-muted">README.md</div>
+				<div class="prose-dark px-5 py-4">
 					@templ.Raw(readme)
 				</div>
-			}
-		</div>
+			</div>
+		}
 	}
 }

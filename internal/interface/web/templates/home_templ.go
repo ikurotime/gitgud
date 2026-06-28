@@ -43,13 +43,21 @@ func Home(user *domain.User) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"text-3xl\">gitgud cool homepage</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"mx-auto max-w-2xl py-16 text-center\"><div class=\"mx-auto mb-8 flex size-14 items-center justify-center rounded-2xl border border-accent/30 bg-accent/[.08] text-accent shadow-[0_0_40px_-6px_rgba(63,207,127,.6)]\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = gitLogo("size-7").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><h1 class=\"text-4xl font-bold tracking-tight text-ink sm:text-5xl\">git hosting,<br><span class=\"text-accent\">stripped down.</span></h1><p class=\"mx-auto mt-5 max-w-md text-muted\">Clone, push, browse, and review — a small, self-hosted home for your repositories.</p><div class=\"mt-8 flex items-center justify-center gap-3\"><a class=\"btn btn-primary\" href=\"/register\">Get started</a> <a class=\"btn\" href=\"/login\">Sign in</a></div><div class=\"mx-auto mt-12 max-w-md rounded-lg border border-line bg-panel2 px-4 py-3 text-left font-mono text-xs text-muted\"><span class=\"text-faint\">$</span> git clone http://localhost:8080/<span class=\"text-accent\">you</span>/<span class=\"text-accent\">repo</span>.git</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout("gitgud", user).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout("gitgud — minimal git hosting", user).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

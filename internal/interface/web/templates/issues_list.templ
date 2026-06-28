@@ -4,29 +4,40 @@ import "gitgud/internal/domain"
 
 templ IssuesList(user *domain.User, repo *domain.Repository, state string, issues []*domain.Issue, openCount, closedCount int) {
 	@Layout("Issues · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "issues")
-			<div class="flex items-center justify-between mb-3">
-				<div class="flex gap-4 text-sm">
-					<a class={ stateTabClass(state, "open") } href={ templ.SafeURL(repoPath(repo, "/issues?state=open")) }>{ itoa(openCount) } Open</a>
-					<a class={ stateTabClass(state, "closed") } href={ templ.SafeURL(repoPath(repo, "/issues?state=closed")) }>{ itoa(closedCount) } Closed</a>
-				</div>
-				if user != nil {
-					<a class="border px-3 py-1 text-sm" href={ templ.SafeURL(repoPath(repo, "/issues/new")) }>New issue</a>
-				}
+		@repoHeader(repo, "issues")
+		<div class="mb-4 flex items-center justify-between">
+			<div class="flex gap-5 text-sm">
+				<a class={ stateTabClass(state, "open") } href={ templ.SafeURL(repoPath(repo, "/issues?state=open")) }>{ itoa(openCount) } Open</a>
+				<a class={ stateTabClass(state, "closed") } href={ templ.SafeURL(repoPath(repo, "/issues?state=closed")) }>{ itoa(closedCount) } Closed</a>
 			</div>
-			if len(issues) == 0 {
-				<p class="text-gray-500">No issues to show.</p>
-			} else {
-				<ul class="border">
-					for _, i := range issues {
-						<li class="border-b px-3 py-2">
-							<a href={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(i.Number))) }>{ i.Title }</a>
-							<div class="text-xs text-gray-500">#{ itoa(i.Number) } · { string(i.State) } · opened by { i.AuthorName }</div>
-						</li>
-					}
-				</ul>
+			if user != nil {
+				<a class="btn btn-primary" href={ templ.SafeURL(repoPath(repo, "/issues/new")) }>+ New issue</a>
 			}
 		</div>
+		if len(issues) == 0 {
+			@emptyState("No issues here", "There are no "+state+" issues in this repository.", "", "")
+		} else {
+			<div class="card overflow-hidden">
+				for _, i := range issues {
+					<div class="row border-b border-line px-4 py-3 last:border-0">
+						<a class="flex items-start gap-2.5" href={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(i.Number))) }>
+							@issueDot(string(i.State))
+							<span class="min-w-0">
+								<span class="block text-ink hover:text-accent">{ i.Title }</span>
+								<span class="meta">#{ itoa(i.Number) } · opened by { i.AuthorName } · { fmtTime(i.CreatedAt) }</span>
+							</span>
+						</a>
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ issueDot(state string) {
+	if state == "open" {
+		<span class="mt-1 size-3.5 shrink-0 rounded-full border-2 border-accent"></span>
+	} else {
+		<span class="mt-1 size-3.5 shrink-0 rounded-full border-2 border-faint"></span>
 	}
 }

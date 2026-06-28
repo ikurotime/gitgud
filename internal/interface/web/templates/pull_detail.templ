@@ -4,51 +4,66 @@ import "gitgud/internal/domain"
 
 templ PullDetail(user *domain.User, repo *domain.Repository, pr *domain.PullRequest, cmp *domain.Comparison, comments []*domain.PRComment, canMerge bool, errMsg string) {
 	@Layout(pr.Title+" · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "pulls")
-			<div class="flex items-center gap-2 mb-1">
-				<h2 class="text-xl">{ pr.Title } <span class="text-gray-400">#{ itoa(pr.Number) }</span></h2>
-				<span class="text-xs border px-2 py-0.5">{ string(pr.State) }</span>
-			</div>
-			<div class="text-xs text-gray-500 mb-4">
-				{ pr.AuthorName } wants to merge <code>{ pr.HeadBranch }</code> into <code>{ pr.BaseBranch }</code>
-			</div>
-			if errMsg != "" {
-				<p class="text-red-600 mb-3">{ errMsg }</p>
+		@repoHeader(repo, "pulls")
+		<h2 class="mb-2 text-2xl font-semibold tracking-tight text-ink">{ pr.Title } <span class="font-normal text-faint">#{ itoa(pr.Number) }</span></h2>
+		<div class="mb-6 flex flex-wrap items-center gap-3">
+			if pr.State == domain.PROpen {
+				<span class="badge-open"><span class="size-2 rounded-full border-2 border-grassink"></span> Open</span>
+			} else if pr.State == domain.PRMerged {
+				<span class="badge-merged"><span class="size-2 rounded-full bg-current"></span> Merged</span>
+			} else {
+				<span class="badge-closed"><span class="size-2 rounded-full border-2 border-current"></span> Closed</span>
 			}
-			@commentCard(pr.AuthorName, fmtTime(pr.CreatedAt), pr.Body)
-			for _, c := range comments {
-				@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
-			}
-			<div class="border p-3 mb-4">
-				if pr.State == domain.PRMerged {
-					<div class="text-purple-700">This pull request was merged.</div>
-				} else if pr.State == domain.PRClosed {
-					<div class="text-gray-600">This pull request was closed.</div>
-				} else if canMerge {
-					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/merge")) }>
+			<span class="text-sm text-muted">
+				<span class="font-medium text-ink">{ pr.AuthorName }</span> wants to merge <span class="badge font-mono text-accent">{ pr.HeadBranch }</span> into <span class="badge font-mono text-accent">{ pr.BaseBranch }</span>
+			</span>
+		</div>
+		if errMsg != "" {
+			<div class="mb-4 rounded-md border border-closed/30 bg-closed/10 px-3 py-2 text-sm text-closed">{ errMsg }</div>
+		}
+		@commentCard(pr.AuthorName, fmtTime(pr.CreatedAt), pr.Body)
+		for _, c := range comments {
+			@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
+		}
+		<div class="card mb-6 p-4">
+			if pr.State == domain.PRMerged {
+				<div class="flex items-center gap-2 text-merged"><span class="size-2 rounded-full bg-merged"></span> This pull request was merged.</div>
+			} else if pr.State == domain.PRClosed {
+				<div class="flex items-center gap-2 text-muted"><span class="size-2 rounded-full bg-faint"></span> This pull request was closed.</div>
+			} else if canMerge {
+				<div class="-mx-4 -mb-4 overflow-hidden rounded-md border border-accent/30">
+					<div class="flex items-center gap-3 bg-accent/[.07] px-4 py-3.5">
+						<span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-grass font-bold text-grassink">✓</span>
+						<div>
+							<div class="text-sm font-semibold text-ink">This branch has no conflicts with the base branch</div>
+							<div class="text-xs text-muted">Merging can be performed automatically.</div>
+						</div>
+					</div>
+					<form class="flex gap-2 px-4 pb-4" method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/merge")) }>
 						@csrfField()
-						<button class="border px-3 py-1 bg-green-700 text-white" type="submit">Merge pull request</button>
+						<button class="btn btn-primary" type="submit">Merge pull request</button>
 					</form>
-				} else if user != nil {
-					<div class="text-gray-600">You cannot merge this pull request.</div>
-				} else {
-					<div class="text-gray-600"><a href="/login">Sign in</a> to act on this pull request.</div>
-				}
-			</div>
-			if cmp != nil {
-				<h3 class="text-md mb-2">Commits</h3>
-				@commitsList(repo, cmp.Commits)
-				<h3 class="text-md mb-2">Files changed</h3>
-				@diffFiles(cmp.Files)
-			}
-			if user != nil {
-				<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/comments")) } class="flex flex-col gap-2 mt-4">
-					@csrfField()
-					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
-					<div><button class="border px-3 py-1" type="submit">Comment</button></div>
-				</form>
+				</div>
+			} else if user != nil {
+				<div class="text-sm text-muted">You don't have permission to merge this pull request.</div>
+			} else {
+				<div class="text-sm text-muted"><a class="text-accent hover:underline" href="/login">Sign in</a> to act on this pull request.</div>
 			}
 		</div>
+		if cmp != nil {
+			<h3 class="mb-2 text-sm font-semibold text-muted">{ itoa(len(cmp.Commits)) } commits</h3>
+			@commitsList(repo, cmp.Commits)
+			<h3 class="mb-2 text-sm font-semibold text-muted">Files changed</h3>
+			@diffFiles(cmp.Files)
+		}
+		if user != nil {
+			<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls/"+itoa(pr.Number)+"/comments")) } class="mt-4 flex flex-col gap-3">
+				@csrfField()
+				<textarea class="textarea" name="body" rows="4" placeholder="Leave a comment… (markdown supported)"></textarea>
+				<div class="flex justify-end">
+					<button class="btn btn-primary" type="submit">Comment</button>
+				</div>
+			</form>
+		}
 	}
 }

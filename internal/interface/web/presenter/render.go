@@ -23,7 +23,7 @@ func RenderMarkdown(src []byte) string {
 }
 
 var (
-	highlightStyle     = styles.Get("github")
+	highlightStyle     = styles.Get("github-dark")
 	highlightFormatter = chromahtml.New(chromahtml.WithClasses(false), chromahtml.WithLineNumbers(true))
 )
 

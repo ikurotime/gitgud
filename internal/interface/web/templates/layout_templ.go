@@ -31,7 +31,7 @@ func Layout(title string, user *domain.User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"dark\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -44,25 +44,50 @@ func Layout(title string, user *domain.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/static/css/main.css\"><script src=\"https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4\"></script></head><body><nav class=\"flex items-center justify-between px-6 py-3 border-b\"><a href=\"/\" class=\"font-bold\">gitgud</a><div class=\"flex items-center gap-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap\" rel=\"stylesheet\"><script src=\"https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4\"></script><style type=\"text/tailwindcss\">\n\t\t\t\t@theme {\n\t\t\t\t\t--color-canvas: #080b09;\n\t\t\t\t\t--color-panel: #0b100d;\n\t\t\t\t\t--color-panel2: #141b16;\n\t\t\t\t\t--color-line: #1e2820;\n\t\t\t\t\t--color-line2: #25342a;\n\t\t\t\t\t--color-ink: #eef4ef;\n\t\t\t\t\t--color-muted: #8a978c;\n\t\t\t\t\t--color-faint: #54605c;\n\t\t\t\t\t--color-accent: #3fcf7f;\n\t\t\t\t\t--color-accenthi: #6fe0a0;\n\t\t\t\t\t--color-grass: #2ea04a;\n\t\t\t\t\t--color-grasshi: #34b554;\n\t\t\t\t\t--color-grassink: #06120a;\n\t\t\t\t\t--color-open: #3fcf7f;\n\t\t\t\t\t--color-closed: #ff7066;\n\t\t\t\t\t--color-merged: #a371f7;\n\t\t\t\t\t--color-warn: #e0c060;\n\t\t\t\t\t--font-sans: \"Geist\", ui-sans-serif, system-ui, sans-serif;\n\t\t\t\t\t--font-mono: \"JetBrains Mono\", ui-monospace, monospace;\n\t\t\t\t}\n\t\t\t\t@layer base {\n\t\t\t\t\thtml { color-scheme: dark; }\n\t\t\t\t\tbody { @apply bg-canvas text-ink font-sans antialiased; }\n\t\t\t\t\tbody::before {\n\t\t\t\t\t\tcontent: \"\";\n\t\t\t\t\t\tposition: fixed;\n\t\t\t\t\t\tinset: 0;\n\t\t\t\t\t\tpointer-events: none;\n\t\t\t\t\t\tz-index: 0;\n\t\t\t\t\t\tbackground: radial-gradient(680px 320px at 50% -120px, rgba(63,207,127,.12), transparent 70%);\n\t\t\t\t\t}\n\t\t\t\t\ta { @apply transition-colors; }\n\t\t\t\t\tcode, pre, .mono { @apply font-mono; }\n\t\t\t\t\t::selection { background: rgba(63,207,127,.30); }\n\t\t\t\t\t::-webkit-scrollbar { width: 10px; height: 10px; }\n\t\t\t\t\t::-webkit-scrollbar-thumb { background: #25342a; border-radius: 9999px; border: 2px solid #080b09; }\n\t\t\t\t\t:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(63,207,127,.55); border-radius: 6px; }\n\t\t\t\t\tmain { animation: rise .42s cubic-bezier(.22,1,.36,1) both; }\n\t\t\t\t\t@keyframes rise { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }\n\t\t\t\t}\n\t\t\t\t@layer components {\n\t\t\t\t\t.btn { @apply inline-flex items-center gap-1.5 rounded-md border border-line2 bg-panel2 px-3 py-1.5 text-sm font-medium text-ink transition hover:border-faint hover:bg-line; }\n\t\t\t\t\t.btn-primary { @apply border-transparent bg-grass font-semibold text-grassink shadow-[0_0_0_1px_rgba(46,160,74,.5),0_6px_20px_-10px_rgba(63,207,127,.8)] hover:bg-grasshi hover:border-transparent; }\n\t\t\t\t\t.btn-danger { @apply text-closed hover:border-closed hover:bg-closed/10; }\n\t\t\t\t\t.input, .textarea, .select { @apply w-full rounded-md border border-line2 bg-[#0e1410] px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-accent; }\n\t\t\t\t\t.card { @apply rounded-md border border-line bg-panel; }\n\t\t\t\t\t.link { @apply text-ink hover:text-accent; }\n\t\t\t\t\t.muted { @apply text-muted; }\n\t\t\t\t\t.meta { @apply font-mono text-xs text-faint; }\n\t\t\t\t\t.tab { @apply inline-flex items-center gap-2 border-b-2 border-transparent pb-2.5 text-sm text-muted transition hover:text-ink; }\n\t\t\t\t\t.tab-active { @apply border-accent font-semibold text-ink; }\n\t\t\t\t\t.badge { @apply inline-flex items-center gap-1 rounded border border-line2 px-2 py-0.5 text-xs font-medium text-muted; }\n\t\t\t\t\t.badge-open { @apply gap-1.5 rounded-full border-transparent bg-grass px-3 py-1 font-semibold text-grassink; }\n\t\t\t\t\t.badge-closed { @apply gap-1.5 rounded-full border-transparent bg-closed/16 px-3 py-1 font-medium text-[#ff8f86]; }\n\t\t\t\t\t.badge-merged { @apply gap-1.5 rounded-full border-transparent bg-merged/16 px-3 py-1 font-medium text-[#c8a6f7]; }\n\t\t\t\t\t.label-bug { @apply inline-flex items-center rounded-full bg-closed/16 px-2.5 py-0.5 text-[10px] font-medium text-[#ff8f86]; }\n\t\t\t\t\t.label-enh { @apply inline-flex items-center rounded-full bg-accent/16 px-2.5 py-0.5 text-[10px] font-medium text-accenthi; }\n\t\t\t\t\t.label-good { @apply inline-flex items-center rounded-full bg-warn/16 px-2.5 py-0.5 text-[10px] font-medium text-warn; }\n\t\t\t\t\t.row { @apply transition hover:bg-panel2; }\n\t\t\t\t\t.diff-add { @apply bg-accent/12 text-[#aee6c4]; }\n\t\t\t\t\t.diff-del { @apply bg-closed/12 text-[#f2b8b3]; }\n\t\t\t\t\t.diff-hunk { @apply bg-[#10171b] text-[#5aa0c8]; }\n\t\t\t\t\t.prose-dark { @apply text-sm leading-relaxed text-muted; }\n\t\t\t\t\t.prose-dark h1 { @apply mt-5 mb-3 text-xl font-semibold text-ink first:mt-0; }\n\t\t\t\t\t.prose-dark h2 { @apply mt-5 mb-2 text-lg font-semibold text-ink first:mt-0; }\n\t\t\t\t\t.prose-dark h3 { @apply mt-4 mb-2 font-semibold text-ink; }\n\t\t\t\t\t.prose-dark p { @apply my-3; }\n\t\t\t\t\t.prose-dark a { @apply text-accent hover:underline; }\n\t\t\t\t\t.prose-dark strong { @apply font-semibold text-ink; }\n\t\t\t\t\t.prose-dark ul { @apply my-3 list-disc pl-5; }\n\t\t\t\t\t.prose-dark ol { @apply my-3 list-decimal pl-5; }\n\t\t\t\t\t.prose-dark li { @apply my-1; }\n\t\t\t\t\t.prose-dark code { @apply rounded border border-line2 bg-panel2 px-1.5 py-0.5 text-[.85em] text-accent; }\n\t\t\t\t\t.prose-dark pre { @apply my-3 overflow-x-auto rounded-lg border border-line bg-panel2 p-4 text-xs; }\n\t\t\t\t\t.prose-dark pre code { @apply bg-transparent p-0; }\n\t\t\t\t\t.prose-dark blockquote { @apply my-3 border-l-2 border-line2 pl-4 text-faint; }\n\t\t\t\t\t.prose-dark hr { @apply my-5 border-line; }\n\t\t\t\t}\n\t\t\t</style></head><body><header class=\"sticky top-0 z-20 border-b border-line bg-canvas/80 backdrop-blur-xl\"><nav class=\"mx-auto flex h-14 max-w-5xl items-center justify-between px-6\"><a href=\"/\" class=\"flex items-center gap-2.5\"><span class=\"text-accent\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = gitLogo("size-5").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span> <span class=\"font-mono font-semibold tracking-tight text-ink\">gitgud</span></a><div class=\"flex items-center gap-4 text-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if user != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<a href=\"/new\">New</a> <span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<a class=\"btn\" href=\"/new\">+ New</a><div class=\"flex items-center gap-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 21, Col: 27}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			templ_7745c5c3_Err = avatar(user.Username, "size-6").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><form method=\"post\" action=\"/logout\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<a class=\"link mono text-muted\" href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 templ.SafeURL = templ.SafeURL("/" + user.Username)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 110, Col: 99}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</a></div><form method=\"post\" action=\"/logout\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -70,40 +95,40 @@ func Layout(title string, user *domain.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<button type=\"submit\">Sign out</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button class=\"text-muted transition hover:text-ink\" type=\"submit\">Sign out</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"/login\">Sign in</a> <a href=\"/register\">Register</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"text-muted transition hover:text-ink\" href=\"/login\">Sign in</a> <a class=\"btn btn-primary\" href=\"/register\">Register</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></nav>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if flashOf(ctx) != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"px-6 py-2 bg-blue-50 border-b border-blue-200 text-blue-800 text-sm\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"mx-auto max-w-5xl px-6 pt-4\"><div class=\"card flex items-center gap-2 border-accent/30 bg-accent/10 px-4 py-2.5 text-sm text-ink\"><span class=\"size-1.5 rounded-full bg-accent\"></span> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(flashOf(ctx))
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(flashOf(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 33, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 127, Col: 20}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<main class=\"p-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<main class=\"relative z-10 mx-auto max-w-5xl px-6 py-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,7 +136,7 @@ func Layout(title string, user *domain.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</main></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</main></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -135,25 +160,134 @@ func csrfField() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(csrfToken(ctx))
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(csrfToken(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 43, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 139, Col: 62}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// gitLogo renders the gitgud branch-network mark. Color is inherited via currentColor.
+func gitLogo(class string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var templ_7745c5c3_Var9 = []any{class}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<svg class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var9).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"6\" cy=\"5.5\" r=\"2.5\"></circle> <circle cx=\"6\" cy=\"18.5\" r=\"2.5\"></circle> <circle cx=\"18\" cy=\"12\" r=\"2.5\"></circle> <path d=\"M6 8v8\"></path> <path d=\"M6 12h6.5a3 3 0 0 0 3-3V9.5\"></path></svg>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// avatar renders a deterministic gradient avatar with the user's initial.
+func avatar(name, class string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var templ_7745c5c3_Var12 = []any{"inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-[#1f7a48] font-semibold text-grassink", class}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var12...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var12).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" style=\"font-size:.62em\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(initial(name))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/interface/web/templates/layout.templ`, Line: 158, Col: 17}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -4,9 +4,6 @@ import "gitgud/internal/domain"
 
 templ NotFound(user *domain.User) {
 	@Layout("Not found · gitgud", user) {
-		<div class="max-w-2xl mx-auto">
-			<h1 class="text-2xl mb-2">404</h1>
-			<p>The page you're looking for doesn't exist.</p>
-		</div>
+		@errorState("404", "This page doesn't exist", "The page you're looking for can't be found, or you don't have access to it.")
 	}
 }

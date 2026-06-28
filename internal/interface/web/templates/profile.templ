@@ -4,13 +4,19 @@ import "gitgud/internal/domain"
 
 templ Profile(user *domain.User, owner string, repos []*domain.Repository) {
 	@Layout(owner+" · gitgud", user) {
-		<div class="max-w-2xl mx-auto">
-			<h1 class="text-2xl mb-4">{ owner }</h1>
-			if len(repos) == 0 {
-				<p>No repositories to show.</p>
-			} else {
-				@repoList(repos)
-			}
+		<div class="mb-6 flex items-center gap-4">
+			<div class="flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-accent to-[#a78bfa] font-mono text-xl font-bold text-white shadow-[0_0_24px_-6px_rgba(110,107,240,.6)]">
+				{ initial(owner) }
+			</div>
+			<div>
+				<h1 class="text-xl font-semibold tracking-tight">{ owner }</h1>
+				<p class="meta mt-0.5">{ itoa(len(repos)) } repositories</p>
+			</div>
 		</div>
+		if len(repos) == 0 {
+			@emptyState("Nothing here yet", "This user has no repositories to show.", "", "")
+		} else {
+			@repoList(repos)
+		}
 	}
 }

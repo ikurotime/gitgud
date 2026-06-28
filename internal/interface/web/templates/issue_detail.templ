@@ -4,46 +4,54 @@ import "gitgud/internal/domain"
 
 templ IssueDetail(user *domain.User, repo *domain.Repository, issue *domain.Issue, comments []*domain.IssueComment, canModify bool) {
 	@Layout(issue.Title+" · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "issues")
-			<div class="flex items-center gap-2 mb-1">
-				<h2 class="text-xl">{ issue.Title } <span class="text-gray-400">#{ itoa(issue.Number) }</span></h2>
-				<span class="text-xs border px-2 py-0.5">{ string(issue.State) }</span>
-			</div>
-			<div class="text-xs text-gray-500 mb-4">opened by { issue.AuthorName } on { fmtTime(issue.CreatedAt) }</div>
-			@commentCard(issue.AuthorName, fmtTime(issue.CreatedAt), issue.Body)
-			for _, c := range comments {
-				@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
-			}
-			if canModify {
-				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+stateAction(issue.State))) } class="mb-4">
-					@csrfField()
-					if issue.State == domain.IssueOpen {
-						<button class="border px-3 py-1 text-sm" type="submit">Close issue</button>
-					} else {
-						<button class="border px-3 py-1 text-sm" type="submit">Reopen issue</button>
-					}
-				</form>
-			}
-			if user != nil {
-				<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+"/comments")) } class="flex flex-col gap-2">
-					@csrfField()
-					<textarea class="border px-2 py-1" name="body" rows="4" placeholder="Leave a comment (markdown supported)"></textarea>
-					<div>
-						<button class="border px-3 py-1" type="submit">Comment</button>
-					</div>
-				</form>
-			} else {
-				<p class="text-sm text-gray-500"><a href="/login">Sign in</a> to comment.</p>
-			}
+		@repoHeader(repo, "issues")
+		<div class="mb-1 flex items-start gap-3">
+			<h2 class="text-2xl font-semibold tracking-tight text-ink">{ issue.Title } <span class="font-normal text-faint">#{ itoa(issue.Number) }</span></h2>
 		</div>
+		<div class="mb-6 flex items-center gap-3">
+			if issue.State == domain.IssueOpen {
+				<span class="badge-open"><span class="size-2 rounded-full border-2 border-grassink"></span> Open</span>
+			} else {
+				<span class="badge-closed"><span class="size-2 rounded-full border-2 border-current"></span> Closed</span>
+			}
+			<span class="meta">{ issue.AuthorName } opened this on { fmtTime(issue.CreatedAt) }</span>
+		</div>
+		@commentCard(issue.AuthorName, fmtTime(issue.CreatedAt), issue.Body)
+		for _, c := range comments {
+			@commentCard(c.AuthorName, fmtTime(c.CreatedAt), c.Body)
+		}
+		if canModify {
+			<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+stateAction(issue.State))) } class="mb-6">
+				@csrfField()
+				if issue.State == domain.IssueOpen {
+					<button class="btn btn-danger" type="submit">Close issue</button>
+				} else {
+					<button class="btn" type="submit">Reopen issue</button>
+				}
+			</form>
+		}
+		if user != nil {
+			<form method="post" action={ templ.SafeURL(repoPath(repo, "/issues/"+itoa(issue.Number)+"/comments")) } class="flex flex-col gap-3">
+				@csrfField()
+				<textarea class="textarea" name="body" rows="4" placeholder="Leave a comment… (markdown supported)"></textarea>
+				<div class="flex justify-end">
+					<button class="btn btn-primary" type="submit">Comment</button>
+				</div>
+			</form>
+		} else {
+			<p class="text-sm text-muted"><a class="text-accent hover:underline" href="/login">Sign in</a> to comment.</p>
+		}
 	}
 }
 
 templ commentCard(author, when, body string) {
-	<div class="border mb-3">
-		<div class="bg-gray-100 px-3 py-1 text-xs text-gray-600">{ author } commented on { when }</div>
-		<div class="px-3 py-2">
+	<div class="card mb-4 overflow-hidden">
+		<div class="flex items-center gap-2 border-b border-line bg-[#0e1410] px-4 py-2.5">
+			@avatar(author, "size-5")
+			<span class="text-sm font-medium text-ink">{ author }</span>
+			<span class="meta">commented on { when }</span>
+		</div>
+		<div class="prose-dark px-4 py-3">
 			@templ.Raw(markdown(body))
 		</div>
 	</div>

@@ -53,9 +53,9 @@ func stateAction(state domain.IssueState) string {
 
 func stateTabClass(current, want string) string {
 	if current == want {
-		return "font-semibold"
+		return "font-semibold text-ink"
 	}
-	return "text-gray-600"
+	return "text-muted hover:text-ink"
 }
 
 func cloneInstructions(repo *domain.Repository) string {
@@ -115,6 +115,23 @@ func itoa(n int) string {
 	return strconv.Itoa(n)
 }
 
+func countVisibility(repos []*domain.Repository, private bool) int {
+	n := 0
+	for _, r := range repos {
+		if r.IsPrivate == private {
+			n++
+		}
+	}
+	return n
+}
+
+func initial(s string) string {
+	if s == "" {
+		return "?"
+	}
+	return strings.ToUpper(s[:1])
+}
+
 func firstLine(s string) string {
 	if i := strings.IndexByte(s, '\n'); i >= 0 {
 		return s[:i]
@@ -124,12 +141,95 @@ func firstLine(s string) string {
 
 func diffLineClass(line string) string {
 	switch {
+	case strings.HasPrefix(line, "@@"):
+		return "diff-hunk"
 	case strings.HasPrefix(line, "+"):
-		return "bg-green-100"
+		return "diff-add"
 	case strings.HasPrefix(line, "-"):
-		return "bg-red-100"
+		return "diff-del"
 	default:
-		return ""
+		return "text-muted"
+	}
+}
+
+// statBlocks renders a 5-square GitHub-style diffstat: green for additions,
+// red for deletions, proportional to the change, padded with neutral squares.
+func statBlocks(added, deleted int) []string {
+	blocks := make([]string, 5)
+	total := added + deleted
+	if total == 0 {
+		for i := range blocks {
+			blocks[i] = "none"
+		}
+		return blocks
+	}
+	greens := added * 5 / total
+	if added > 0 && greens == 0 {
+		greens = 1
+	}
+	reds := 5 - greens
+	if deleted > 0 && reds == 0 && greens > 0 {
+		greens--
+		reds = 1
+	}
+	for i := range blocks {
+		switch {
+		case i < greens:
+			blocks[i] = "add"
+		case i < greens+reds:
+			blocks[i] = "del"
+		default:
+			blocks[i] = "none"
+		}
+	}
+	return blocks
+}
+
+// langLabel maps a file path to a human language label for the blob header.
+func langLabel(path string) string {
+	ext := strings.ToLower(path)
+	if i := strings.LastIndexByte(ext, '.'); i >= 0 {
+		ext = ext[i+1:]
+	}
+	switch ext {
+	case "go":
+		return "Go"
+	case "js", "mjs", "cjs":
+		return "JavaScript"
+	case "ts", "tsx":
+		return "TypeScript"
+	case "py":
+		return "Python"
+	case "rs":
+		return "Rust"
+	case "rb":
+		return "Ruby"
+	case "java":
+		return "Java"
+	case "c", "h":
+		return "C"
+	case "cpp", "cc", "hpp":
+		return "C++"
+	case "sh", "bash", "zsh":
+		return "Shell"
+	case "html", "htm":
+		return "HTML"
+	case "css":
+		return "CSS"
+	case "json":
+		return "JSON"
+	case "yml", "yaml":
+		return "YAML"
+	case "md", "markdown":
+		return "Markdown"
+	case "sql":
+		return "SQL"
+	case "templ":
+		return "Templ"
+	case "":
+		return "Text"
+	default:
+		return strings.ToUpper(ext)
 	}
 }
 

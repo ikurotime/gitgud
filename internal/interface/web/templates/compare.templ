@@ -4,41 +4,47 @@ import "gitgud/internal/domain"
 
 templ Compare(user *domain.User, repo *domain.Repository, base, head string, branches []string, cmp *domain.Comparison, errMsg string) {
 	@Layout("Compare · "+repo.Name, user) {
-		<div class="max-w-3xl mx-auto">
-			@repoHeader(repo, "pulls")
-			<h2 class="text-lg mb-3">Compare changes</h2>
-			if errMsg != "" {
-				<p class="text-red-600 mb-3">{ errMsg }</p>
-			}
-			<form method="get" action={ templ.SafeURL(repoPath(repo, "/compare")) } class="flex items-center gap-2 mb-4 text-sm">
-				<span>base</span>
-				<select name="base" class="border px-2 py-1">
-					@branchOptions(branches, base)
-				</select>
-				<span>←</span>
-				<span>compare</span>
-				<select name="head" class="border px-2 py-1">
-					<option value="">select branch</option>
-					@branchOptions(branches, head)
-				</select>
-				<button class="border px-3 py-1" type="submit">Compare</button>
-			</form>
-			if cmp != nil {
-				<div class="mb-4 text-sm text-gray-600">{ itoa(len(cmp.Commits)) } commit(s), { itoa(len(cmp.Files)) } file(s) changed</div>
-				if user != nil && cmp.Mergeable {
-					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls")) } class="flex flex-col gap-3 mb-6 border p-3">
+		@repoHeader(repo, "pulls")
+		<h2 class="mb-4 text-lg font-semibold tracking-tight">Compare changes</h2>
+		if errMsg != "" {
+			<div class="mb-4 rounded-md border border-closed/30 bg-closed/10 px-3 py-2 text-sm text-closed">{ errMsg }</div>
+		}
+		<form method="get" action={ templ.SafeURL(repoPath(repo, "/compare")) } class="mb-6 flex flex-wrap items-center gap-2 text-sm">
+			<span class="text-muted">base</span>
+			<select name="base" class="select w-auto py-1.5 font-mono text-xs">
+				@branchOptions(branches, base)
+			</select>
+			<span class="text-faint">←</span>
+			<span class="text-muted">compare</span>
+			<select name="head" class="select w-auto py-1.5 font-mono text-xs">
+				<option value="">select branch</option>
+				@branchOptions(branches, head)
+			</select>
+			<button class="btn" type="submit">Compare</button>
+		</form>
+		if cmp != nil {
+			<div class="mb-5 flex items-center gap-2 text-sm text-muted">
+				<span class="badge"><span class="text-open">{ itoa(len(cmp.Commits)) }</span> commits</span>
+				<span class="badge"><span class="text-accent">{ itoa(len(cmp.Files)) }</span> files changed</span>
+			</div>
+			if user != nil && cmp.Mergeable {
+				<div class="card mb-6 p-5">
+					<h3 class="mb-3 font-semibold text-ink">Open a pull request</h3>
+					<form method="post" action={ templ.SafeURL(repoPath(repo, "/pulls")) } class="flex flex-col gap-3">
 						@csrfField()
 						<input type="hidden" name="base" value={ base }/>
 						<input type="hidden" name="head" value={ head }/>
-						<input class="border px-2 py-1" type="text" name="title" placeholder="Title" value={ head }/>
-						<textarea class="border px-2 py-1" name="body" rows="5" placeholder="Description (markdown supported)"></textarea>
-						<div><button class="border px-3 py-1" type="submit">Create pull request</button></div>
+						<input class="input" type="text" name="title" placeholder="Title" value={ head }/>
+						<textarea class="textarea" name="body" rows="4" placeholder="Description (markdown supported)"></textarea>
+						<div class="flex justify-end">
+							<button class="btn btn-primary" type="submit">Create pull request</button>
+						</div>
 					</form>
-				}
-				@commitsList(repo, cmp.Commits)
-				@diffFiles(cmp.Files)
+				</div>
 			}
-		</div>
+			@commitsList(repo, cmp.Commits)
+			@diffFiles(cmp.Files)
+		}
 	}
 }
 

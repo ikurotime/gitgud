@@ -3,41 +3,47 @@ package templates
 import "gitgud/internal/domain"
 
 templ repoHeader(repo *domain.Repository, active string) {
-	<div class="border-b mb-4 pb-2">
-		<div class="flex items-center gap-2 mb-2">
-			<h1 class="text-xl">
-				<a href={ templ.SafeURL("/" + repo.OwnerName) }>{ repo.OwnerName }</a>
-				<span>/</span>
-				<a class="font-semibold" href={ templ.SafeURL(repoPath(repo, "")) }>{ repo.Name }</a>
+	<div class="mb-6">
+		<div class="mb-4 flex items-center gap-3">
+			<span class="text-accent">@gitLogo("size-5")</span>
+			<h1 class="flex items-center gap-1.5 font-mono text-[15px]">
+				<a class="text-accent hover:underline" href={ templ.SafeURL("/" + repo.OwnerName) }>{ repo.OwnerName }</a>
+				<span class="text-faint">/</span>
+				<a class="font-semibold text-ink hover:text-accent" href={ templ.SafeURL(repoPath(repo, "")) }>{ repo.Name }</a>
 			</h1>
 			if repo.IsPrivate {
-				<span class="text-xs border px-1">private</span>
+				<span class="badge"><span class="size-1.5 rounded-full bg-warn"></span> private</span>
+			} else {
+				<span class="badge">public</span>
 			}
 		</div>
-		<nav class="flex gap-4 text-sm">
+		<nav class="flex gap-1 border-b border-line">
 			@repoTab(repoPath(repo, ""), "Code", active == "code")
 			@repoTab(repoPath(repo, "/issues"), "Issues", active == "issues")
-			@repoTab(repoPath(repo, "/pulls"), "Pulls", active == "pulls")
+			@repoTab(repoPath(repo, "/pulls"), "Pull requests", active == "pulls")
 		</nav>
 	</div>
 }
 
 templ repoTab(href, label string, current bool) {
 	if current {
-		<a class="font-bold border-b-2 border-black pb-1" href={ templ.SafeURL(href) }>{ label }</a>
+		<a class="tab tab-active px-3" href={ templ.SafeURL(href) }>{ label }</a>
 	} else {
-		<a class="pb-1 text-gray-600" href={ templ.SafeURL(href) }>{ label }</a>
+		<a class="tab px-3" href={ templ.SafeURL(href) }>{ label }</a>
 	}
 }
 
 templ branchSwitcher(repo *domain.Repository, ref string, branches []string) {
-	<select class="border px-2 py-1 text-sm" onchange="location.href=this.value">
-		for _, b := range branches {
-			if b == ref {
-				<option value={ repoPath(repo, "/tree/" + b) } selected>{ b }</option>
-			} else {
-				<option value={ repoPath(repo, "/tree/" + b) }>{ b }</option>
+	<div class="relative inline-flex">
+		<select class="select w-auto cursor-pointer appearance-none py-1.5 pr-9 pl-3 font-mono text-xs" onchange="location.href=this.value">
+			for _, b := range branches {
+				if b == ref {
+					<option value={ repoPath(repo, "/tree/" + b) } selected>{ b }</option>
+				} else {
+					<option value={ repoPath(repo, "/tree/" + b) }>{ b }</option>
+				}
 			}
-		}
-	</select>
+		</select>
+		<span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint">▾</span>
+	</div>
 }

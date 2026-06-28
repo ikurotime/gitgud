@@ -4,32 +4,68 @@ import "gitgud/internal/domain"
 
 templ Dashboard(user *domain.User, repos []*domain.Repository) {
 	@Layout("Dashboard · gitgud", user) {
-		<div class="max-w-2xl mx-auto">
-			<div class="flex items-center justify-between mb-4">
-				<h1 class="text-2xl">Your repositories</h1>
-				<a class="border px-3 py-1" href="/new">New repository</a>
+		<div class="grid gap-6 md:grid-cols-[230px_1fr]">
+			<aside class="space-y-5">
+				<div class="flex items-center gap-3">
+					@avatar(user.Username, "size-9")
+					<div class="min-w-0">
+						<div class="truncate text-sm font-semibold text-ink">{ user.Username }</div>
+						<div class="truncate font-mono text-[11px] text-faint">{ user.Username + "@self-hosted" }</div>
+					</div>
+				</div>
+				<a class="btn btn-primary w-full justify-center" href="/new">+ New repository</a>
+				<div>
+					<div class="mb-2.5 font-mono text-[11px] font-semibold tracking-wider text-faint uppercase">Repositories</div>
+					<div class="flex flex-col gap-0.5 font-mono text-[13px]">
+						<span class="rounded bg-panel2 px-2.5 py-1.5 text-ink">all <span class="text-faint">{ itoa(len(repos)) }</span></span>
+						<span class="rounded px-2.5 py-1.5 text-muted">public <span class="text-faint">{ itoa(countVisibility(repos, false)) }</span></span>
+						<span class="rounded px-2.5 py-1.5 text-muted">private <span class="text-faint">{ itoa(countVisibility(repos, true)) }</span></span>
+					</div>
+				</div>
+			</aside>
+			<div>
+				<h1 class="mb-4 text-base font-semibold text-ink">Your repositories</h1>
+				if len(repos) == 0 {
+					@emptyState("No repositories yet", "Create your first repository to start pushing code.", "/new", "Create repository")
+				} else {
+					@repoList(repos)
+				}
 			</div>
-			if len(repos) == 0 {
-				<p>You don't have any repositories yet. <a href="/new">Create one</a>.</p>
-			} else {
-				@repoList(repos)
-			}
 		</div>
 	}
 }
 
 templ repoList(repos []*domain.Repository) {
-	<ul class="flex flex-col gap-3">
+	<div class="flex flex-col">
 		for _, repo := range repos {
-			<li class="border-b pb-2">
-				<a class="text-lg" href={ templ.SafeURL("/" + repo.OwnerName + "/" + repo.Name) }>{ repo.OwnerName }/{ repo.Name }</a>
-				if repo.IsPrivate {
-					<span class="text-xs border px-1 ml-2">private</span>
-				}
+			<a class="group block border-t border-line py-3.5 last:border-b" href={ templ.SafeURL("/" + repo.OwnerName + "/" + repo.Name) }>
+				<div class="mb-1.5 flex items-center gap-2">
+					<span class="font-mono text-sm font-semibold text-accent group-hover:underline">{ repo.OwnerName }/{ repo.Name }</span>
+					if repo.IsPrivate {
+						<span class="rounded border border-[#4a3d24] px-1.5 py-0.5 font-mono text-[10px] text-warn">private</span>
+					} else {
+						<span class="rounded border border-line2 px-1.5 py-0.5 font-mono text-[10px] text-faint">public</span>
+					}
+				</div>
 				if repo.Description != "" {
-					<p class="text-sm text-gray-600">{ repo.Description }</p>
+					<p class="mb-2.5 line-clamp-2 text-[13px] text-muted">{ repo.Description }</p>
 				}
-			</li>
+				<div class="flex items-center gap-1.5 font-mono text-xs text-faint">
+					<span class="size-2 rounded-full bg-accent"></span>
+					{ repo.DefaultBranch }
+				</div>
+			</a>
 		}
-	</ul>
+	</div>
+}
+
+templ emptyState(title, body, href, cta string) {
+	<div class="card flex flex-col items-center px-6 py-14 text-center">
+		<div class="mb-4 flex size-10 items-center justify-center rounded-full border border-line2 text-faint">·</div>
+		<h3 class="font-semibold text-ink">{ title }</h3>
+		<p class="mt-1 max-w-sm text-sm text-muted">{ body }</p>
+		if href != "" {
+			<a class="btn btn-primary mt-5" href={ templ.SafeURL(href) }>{ cta }</a>
+		}
+	</div>
 }
